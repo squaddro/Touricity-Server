@@ -1,4 +1,4 @@
-package com.squadro.touricity.message;
+package com.squadro.touricity.message.types;
 
 public class Greeting {
     private final String content;

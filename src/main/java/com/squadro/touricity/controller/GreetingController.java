@@ -1,6 +1,6 @@
 package com.squadro.touricity.controller;
 
-import com.squadro.touricity.message.Greeting;
+import com.squadro.touricity.message.types.Greeting;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
