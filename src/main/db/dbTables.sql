@@ -1,81 +1,81 @@
 
 CREATE TABLE DB_ACCOUNT (
-    Account_Id varchar(20)
+       Account_Id char(36)
 );
 
 CREATE TABLE DB_USER (
-    Account_Id varchar(20),
-	Username varchar(20),
-	User_Password varchar(20)
+       Account_Id char(36),
+       Username varchar(20),
+       User_Password varchar(20)
 );
 
 CREATE TABLE DB_SESSION (
-    Account_Id varchar(20),
-	Session_Id varchar(20)
+       Account_Id char(36),
+       Session_Id char(36)
 );
 
 CREATE TABLE DB_ROUTE (
-    Creator varchar(20),
-    Route_Id varchar(20)
+       Creator char(36),
+       Route_Id char(36)
 );
 
 CREATE TABLE DB_ENTRY (
-	Route_Id varchar(20),
-	Stop_Id varchar(20),
-	Path_Id varchar(20),
-	Entry_Id varchar(20),
-   	Expense integer,
-   	Duration integer,
-	Comment_desc varchar(1000)	
+       Route_Id char(36),
+       Stop_Id char(36),
+       Path_Id char(36),
+       Entry_Id char(36),
+       Expense integer,
+       Duration integer,
+       Comment_desc varchar(1000)	
 );
    
 CREATE TABLE DB_PATH (
-       Path_Id varchar(20),
-       Path_Type varchar(100),
+       Path_Id char(36),
+       Path_Type integer,
        Vertices bytea
 );
  
 CREATE TABLE DB_STOP (
-       Location_Id varchar(20),
-       Stop_Id varchar(20)
+       Location_Id char(36),
+       Stop_Id char(36)
 );
 
 CREATE TABLE DB_LOCATION (
-       Location_Id varchar(20),
+       Location_Id char(36),
        Latitude char(36),
        Longitude char(36)
 );
 
 CREATE TABLE DB_LIKE (
-       Account_Id varchar(20),
-       Like_Id varchar(20),
+       Account_Id char(36),
+       Like_Id char(36),
        Score integer
 );
 
 CREATE TABLE DB_COMMENT (
-       Account_Id varchar(20),
-       Comment_Id varchar(20),
+       Account_Id char(36),
+       Comment_Id char(36),
        Comment_desc varchar(1000)
 );
 
 CREATE TABLE DB_LOCATION_LIKE (
-       Location_Id varchar(20),
-       Like_Id varchar(20)
+       Location_Id char(36),
+       Like_Id char(36)
 );
 
 CREATE TABLE DB_LOCATION_COMMENT (
-       Location_Id varchar(20),
-       Comment_Id varchar(20)
+       Location_Id char(36),
+       Comment_Id char(36)
 );
 
 CREATE TABLE DB_ROUTE_LIKE (
-       Route_Id varchar(20),
-       Like_Id varchar(20)
+       Route_Id char(36),
+       Like_Id char(36)
 );
 
 CREATE TABLE DB_ROUTE_COMMENT (
-       Route_Id varchar(20),
-       Comment_Id varchar(20)
+       Route_Id char(36),
+       Comment_Id char(36)
 );
 
 
