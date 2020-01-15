@@ -10,9 +10,12 @@ public class Stop extends Entry implements IStop{
 		
 	}
 	
-	public Stop(String location_id, String stop_id){
+	public Stop(String location_id, String stop_id, int expense, int duration, String comment){
 		this.location_id = location_id;
 		this.stop_id = stop_id;
+		this.expense = expense;
+		this.duration = duration;
+		this.comment = comment;
 	}
 	
 	public String getLocation_id() {

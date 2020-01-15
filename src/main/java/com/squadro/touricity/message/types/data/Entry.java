@@ -7,15 +7,7 @@ public abstract class Entry implements IEntry {
     public int expense;
     public String comment;
 	
-    public Entry(){
-    	//do nothing
-    }
-    
-    public Entry(int duration, int expense, String comment){
-    	this.duration = duration;
-    	this.expense = expense;
-    	this.comment = comment;
-    }
+
 	public int getDuration() {
 		return duration;
 	}
