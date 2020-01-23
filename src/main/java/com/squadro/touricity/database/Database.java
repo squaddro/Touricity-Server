@@ -63,8 +63,6 @@ public class Database {
 	private final static String DATABASE_ROUTE_COMMENT = "DB_ROUTE_COMMENT";
 	private final static String DATABASE_ROUTE_COMMENT_ROUTE_ID = "Route_Id";
 	private final static String DATABASE_ROUTE_COMMENT_COMMENT_ID = "Comment_Id";
-
-	
 	private String databaseUrl;
 
 	private Database() {
