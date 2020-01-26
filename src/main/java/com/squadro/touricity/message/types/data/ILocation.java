@@ -2,10 +2,10 @@ package com.squadro.touricity.message.types.data;
 
 public interface ILocation {
 	String getLocation_id();
-	String getLatitude();
-	String getLongitude();
+	double getLatitude();
+	double getLongitude();
 
 	void setLocation_id(String locationId);
-	void setLatitude(String latitude);
-	void setLongitude(String longitude);
+	void setLatitude(double latitude);
+	void setLongitude(double longitude);
 }
