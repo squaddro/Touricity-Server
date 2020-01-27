@@ -4,22 +4,31 @@ import com.squadro.touricity.message.types.data.enumeration.PathType;
 
 public interface IPath extends IEntry {
 	class PathVertex {
-		private String latitude;
-		private String longitude;
+		private double latitude;
+		private double longitude;
 
-		void setLatitude(String latitude) {
+		public PathVertex(){
+
+		}
+
+		public PathVertex(double latitude, double longitude){
+            this.latitude = latitude;
+            this.longitude = longitude;
+		}
+
+		public void setLatitude(double latitude) {
 			this.latitude = latitude;
 		}
 
-		void setLongitude(String longitude) {
+		public void setLongitude(double longitude) {
 			this.longitude = longitude;
 		}
 
-		String getLatitude() {
+		public double getLatitude() {
 			return latitude;
 		}
 
-		String getLongitude() {
+		public double getLongitude() {
 			return longitude;
 		}
 	}

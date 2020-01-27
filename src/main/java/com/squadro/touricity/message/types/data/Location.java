@@ -4,13 +4,13 @@ package com.squadro.touricity.message.types.data;
 public class Location implements ILocation {
 
 	private String location_id;
-	private String latitude;
-	private String longitude;
+	private double latitude;
+	private double longitude;
 	
 	public Location(){
 	}
 	
-	public Location(String locationId, String latitude, String longitude){
+	public Location(String locationId, double latitude, double longitude){
 		this.location_id = locationId;
 		this.latitude = latitude;
 		this.longitude = longitude;
@@ -20,11 +20,11 @@ public class Location implements ILocation {
 		return location_id;
 	}
 
-	public String getLatitude() {
+	public double getLatitude() {
 		return latitude;
 	}
 
-	public String getLongitude() {
+	public double getLongitude() {
 		return longitude;
 	}
 
@@ -32,11 +32,11 @@ public class Location implements ILocation {
         location_id = locationId;		
 	}
 
-	public void setLatitude(String latitude) {
+	public void setLatitude(double latitude) {
 		this.latitude = latitude;
 	}
 
-	public void setLongitude(String longitude) {
+	public void setLongitude(double longitude) {
 		this.longitude = longitude;
 	}
 
