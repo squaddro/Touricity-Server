@@ -14,7 +14,7 @@ public class Database {
 
 	private static Database instance;
 
-	private final static String ENVIRONMENT_DATABASE_URL = "DATABASE_URL";
+	private final static String ENVIRONMENT_DATABASE_URL = "DB_URL";
 
 	public final static String ACCOUNT = "DB_ACCOUNT";
 	public final static String ACCOUNT_ACCOUNT_ID = "Account_Id";
