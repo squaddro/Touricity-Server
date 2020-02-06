@@ -77,7 +77,6 @@ public class Database {
 	public final static String ROUTE_COMMENT_COMMENT_ID = "Comment_Id";
 
 	private String databaseUrl;
-	private boolean lastConnectionCheck;
 
 	private Database() {
 		databaseUrl = System.getenv(ENVIRONMENT_DATABASE_URL);
@@ -145,11 +144,11 @@ public class Database {
 
 		getInstance().execute(new SelectionQuery() {
 			public String getQuery() {
-				return "SELECT * FROM TABLES";
+				return "SELECT * FROM PG_TABLES";
 			}
 
 			public boolean onResult(QueryResult result) {
-				LoggerFactory.getLogger(Database.class).debug("Connected to the database!");
+				LoggerFactory.getLogger(Database.class).info("Connected to the database!");
 				connectionCheck.set(true);
 				return false;
 			}
