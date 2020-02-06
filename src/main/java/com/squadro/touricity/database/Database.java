@@ -1,72 +1,86 @@
 package com.squadro.touricity.database;
 
+import com.squadro.touricity.database.query.SelectionQuery;
 import com.squadro.touricity.database.query.pipeline.IPipelinedQuery;
 import com.squadro.touricity.database.query.ISingleQuery;
 import com.squadro.touricity.database.result.QueryResult;
+import org.slf4j.LoggerFactory;
 
-import java.net.URISyntaxException;
 import java.sql.*;
 import java.util.Queue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Database {
 
 	private static Database instance;
+
 	private final static String ENVIRONMENT_DATABASE_URL = "DATABASE_URL";
-	public final static String DATABASE_ACCOUNT = "DB_ACCOUNT";
-	public final static String DATABASE_ACCOUNT_ACCOUNT_ID = "Account_Id";
-	public final static String DATABASE_USER = "DB_USER";
-	public final static String DATABASE_USER_ACCOUNT_ID = "Account_Id";
-	public final static String DATABASE_USER_USERNAME = "Username";
-	public final static String DATABASE_USER_PASSWORD = "User_Password";
-	public final static String DATABASE_SESSION = "DB_SESSION";
-	public final static String DATABASE_SESSION_ACCOUNT_ID = "Account_Id";
-	public final static String DATABASE_SESSION_SESSION_ID = "Session_Id";
-	public final static String DATABASE_ROUTE = "DB_ROUTE";
-	public final static String DATABASE_ROUTE_CREATOR = "Creator";
-	public final static String DATABASE_ROUTE_ROUTE_ID = "Route_Id";
-	public final static String DATABASE_ENTRY = "DB_ENTRY";
-	public final static String DATABASE_ENTRY_ROUTE_ID = "Route_Id";
-	public final static String DATABASE_ENTRY_STOP_ID = "Stop_Id";
-	public final static String DATABASE_ENTRY_PATH_ID = "Path_Id";
-	public final static String DATABASE_ENTRY_ENTRY_ID = "Entry_Id";
-	public final static String DATABASE_ENTRY_EXPENSE = "Expense";
-	public final static String DATABASE_ENTRY_DURATION = "Duration";
-	public final static String DATABASE_ENTRY_COMMENT_DESCRIPTION = "Comment_desc";
-	public final static String DATABASE_PATH = "DB_PATH";
-	public final static String DATABASE_PATH_PATH_ID = "Path_Id";
-	public final static String DATABASE_PATH_PATH_TYPE = "Path_Type";
-	public final static String DATABASE_PATH_VERTICES = "Vertices";
-	public final static String DATABASE_STOP = "DB_STOP";
-	public final static String DATABASE_STOP_LOCATION_ID = "Location_Id";
-	public final static String DATABASE_STOP_STOP_ID = "Stop_Id";
-	public final static String DATABASE_LOCATION = "DB_LOCATION";
-	public final static String DATABASE_LOCATION_LOCATION_ID = "Location_Id";
-	public final static String DATABASE_LOCATION_LATITUDE = "Latitude";
-	public final static String DATABASE_LOCATION_LONGITUDE = "Longitude";
-	public final static String DATABASE_LIKE = "DB_LIKE";
-	public final static String DATABASE_LIKE_ACCOUNT_ID = "Account_Id";
-	public final static String DATABASE_LIKE_LIKE_ID = "Like_Id";
-	public final static String DATABASE_LIKE_SCORE = "Score";
-	public final static String DATABASE_COMMENT = "DB_COMMENT";
-	public final static String DATABASE_COMMENT_ACCOUNT_ID = "Account_Id";
-	public final static String DATABASE_COMMENT_COMMENT_ID = "Comment_Id";
-	public final static String DATABASE_COMMENT_COMMENT_DESCRIPTION = "Comment_desc";
-	public final static String DATABASE_LOCATION_LIKE = "DB_LOCATION_LIKE";
-	public final static String DATABASE_LOCATION_LIKE_LOCATION_ID = "Location_Id";
-	public final static String DATABASE_LOCATION_LIKE_LIKE_ID = "Like_Id";
-	public final static String DATABASE_LOCATION_COMMENT = "DB_LOCATION_COMMENT";
-	public final static String DATABASE_LOCATION_COMMENT_LOCATION_ID = "Location_Id";
-	public final static String DATABASE_LOCATION_COMMENT_COMMENT_ID = "Comment_Id";
-	public final static String DATABASE_ROUTE_LIKE = "DB_ROUTE_LIKE";
-	public final static String DATABASE_ROUTE_LIKE_ROUTE_ID = "Route_Id";
-	public final static String DATABASE_ROUTE_LIKE_LIKE_ID = "Like_Id";
-	public final static String DATABASE_ROUTE_COMMENT = "DB_ROUTE_COMMENT";
-	public final static String DATABASE_ROUTE_COMMENT_ROUTE_ID = "Route_Id";
-	public final static String DATABASE_ROUTE_COMMENT_COMMENT_ID = "Comment_Id";
+
+	public final static String ACCOUNT = "DB_ACCOUNT";
+	public final static String ACCOUNT_ACCOUNT_ID = "Account_Id";
+	public final static String USER = "DB_USER";
+	public final static String USER_ACCOUNT_ID = "Account_Id";
+	public final static String USER_USERNAME = "Username";
+	public final static String USER_PASSWORD = "User_Password";
+	public final static String SESSION = "DB_SESSION";
+	public final static String SESSION_ACCOUNT_ID = "Account_Id";
+	public final static String SESSION_SESSION_ID = "Session_Id";
+	public final static String ROUTE = "DB_ROUTE";
+	public final static String ROUTE_CREATOR = "Creator";
+	public final static String ROUTE_ROUTE_ID = "Route_Id";
+	public final static String ROUTE_CITY_ID = "City_Id";
+	public final static String ROUTE_TITLE = "Title";
+	public final static String ROUTE_DESC = "Route_Desc";
+	public final static String ROUTE_PRIVACY = "Privacy";
+	public final static String ENTRY = "DB_ENTRY";
+	public final static String ENTRY_ROUTE_ID = "Route_Id";
+	public final static String ENTRY_STOP_ID = "Stop_Id";
+	public final static String ENTRY_PATH_ID = "Path_Id";
+	public final static String ENTRY_ENTRY_ID = "Entry_Id";
+	public final static String ENTRY_EXPENSE = "Expense";
+	public final static String ENTRY_DURATION = "Duration";
+	public final static String ENTRY_COMMENT_DESCRIPTION = "Comment_desc";
+	public final static String PATH = "DB_PATH";
+	public final static String PATH_PATH_ID = "Path_Id";
+	public final static String PATH_PATH_TYPE = "Path_Type";
+	public final static String PATH_VERTICES = "Vertices";
+	public final static String STOP = "DB_STOP";
+	public final static String STOP_LOCATION_ID = "Location_Id";
+	public final static String STOP_STOP_ID = "Stop_Id";
+	public final static String LOCATION = "DB_LOCATION";
+	public final static String LOCATION_CITY_ID = "City_Id";
+	public final static String LOCATION_LOCATION_ID = "Location_Id";
+	public final static String LOCATION_LATITUDE = "Latitude";
+	public final static String LOCATION_LONGITUDE = "Longitude";
+	public final static String LIKE = "DB_LIKE";
+	public final static String LIKE_ACCOUNT_ID = "Account_Id";
+	public final static String LIKE_LIKE_ID = "Like_Id";
+	public final static String LIKE_SCORE = "Score";
+	public final static String COMMENT = "DB_COMMENT";
+	public final static String COMMENT_ACCOUNT_ID = "Account_Id";
+	public final static String COMMENT_COMMENT_ID = "Comment_Id";
+	public final static String COMMENT_COMMENT_DESCRIPTION = "Comment_desc";
+	public final static String CITY = "DB_CITY";
+	public final static String CITY_CITY_ID = "City_Id";
+	public final static String CITY_CITY_NAME = "City_Name";
+	public final static String LOCATION_LIKE = "DB_LOCATION_LIKE";
+	public final static String LOCATION_LIKE_LOCATION_ID = "Location_Id";
+	public final static String LOCATION_LIKE_LIKE_ID = "Like_Id";
+	public final static String LOCATION_COMMENT = "DB_LOCATION_COMMENT";
+	public final static String LOCATION_COMMENT_LOCATION_ID = "Location_Id";
+	public final static String LOCATION_COMMENT_COMMENT_ID = "Comment_Id";
+	public final static String ROUTE_LIKE = "DB_ROUTE_LIKE";
+	public final static String ROUTE_LIKE_ROUTE_ID = "Route_Id";
+	public final static String ROUTE_LIKE_LIKE_ID = "Like_Id";
+	public final static String ROUTE_COMMENT = "DB_ROUTE_COMMENT";
+	public final static String ROUTE_COMMENT_ROUTE_ID = "Route_Id";
+	public final static String ROUTE_COMMENT_COMMENT_ID = "Comment_Id";
+
 	private String databaseUrl;
+	private boolean lastConnectionCheck;
 
 	private Database() {
-		String databaseUrl = System.getenv(ENVIRONMENT_DATABASE_URL);
+		databaseUrl = System.getenv(ENVIRONMENT_DATABASE_URL);
 	}
 
 	private Connection connect() throws SQLException {
@@ -124,5 +138,29 @@ public class Database {
 			if(!getInstance().executeQuery(queue.poll()))
 				break;
 		}
+	}
+
+	public static boolean checkConnection() {
+		final AtomicBoolean connectionCheck = new AtomicBoolean();
+
+		getInstance().execute(new SelectionQuery() {
+			public String getQuery() {
+				return "SELECT * FROM TABLES";
+			}
+
+			public boolean onResult(QueryResult result) {
+				LoggerFactory.getLogger(Database.class).debug("Connected to the database!");
+				connectionCheck.set(true);
+				return false;
+			}
+
+			@Override
+			public void onError(String e) {
+				LoggerFactory.getLogger(Database.class).error("Couldn't connect to the database!");
+				connectionCheck.set(false);
+			}
+		});
+
+		return connectionCheck.get();
 	}
 }

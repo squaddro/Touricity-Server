@@ -4,8 +4,10 @@ public interface ILocation {
 	String getLocation_id();
 	double getLatitude();
 	double getLongitude();
+	String getCity_id();
 
 	void setLocation_id(String locationId);
 	void setLatitude(double latitude);
 	void setLongitude(double longitude);
+	void setCity_id(String cityId);
 }

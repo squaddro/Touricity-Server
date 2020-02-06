@@ -3,9 +3,12 @@ package com.squadro.touricity.message.types.data;
 
 public class Route implements IRoute {
 
-	public String creator;
-	public String route_id;
-	public IEntry[] entries;
+	private String creator;
+	private String route_id;
+	private IEntry[] entries;
+	private String cityId;
+	private String title;
+	private int privacy;
 	
 	public Route(){
 		//do nothing
@@ -29,6 +32,18 @@ public class Route implements IRoute {
 		return entries;
 	}
 
+	public String getCity_id() {
+		return cityId;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public int getPrivacy() {
+		return privacy;
+	}
+
 	public void setCreator(String creatorId) {
         creator = creatorId;		
 	}
@@ -41,4 +56,15 @@ public class Route implements IRoute {
         entries = setEntries;		
 	}
 
+	public void setCity_id(String cityId) {
+		this.cityId = cityId;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public void setPrivacy(int privacy) {
+		this.privacy = privacy;
+	}
 }

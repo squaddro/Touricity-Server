@@ -3,9 +3,9 @@ package com.squadro.touricity.message.types.data;
 
 public abstract class Entry implements IEntry {
 	
-    public int duration;
-    public int expense;
-    public String comment;
+    protected int duration;
+    protected int expense;
+    protected String comment;
 	
 
 	public int getDuration() {

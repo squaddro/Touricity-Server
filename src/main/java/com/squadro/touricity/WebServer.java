@@ -1,5 +1,6 @@
 package com.squadro.touricity;
 
+import com.squadro.touricity.database.Database;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +13,7 @@ public class WebServer {
 	
 	public static void main(String[] args){
 		SpringApplication.run(WebServer.class, args);
+		Database.checkConnection();
 	}
 
 	@Bean
