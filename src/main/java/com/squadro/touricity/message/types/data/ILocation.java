@@ -1,6 +1,6 @@
 package com.squadro.touricity.message.types.data;
 
-public interface ILocation {
+public interface ILocation extends IDataType {
 	String getLocation_id();
 	double getLatitude();
 	double getLongitude();

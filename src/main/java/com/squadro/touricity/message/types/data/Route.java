@@ -1,5 +1,6 @@
 package com.squadro.touricity.message.types.data;
 
+import com.squadro.touricity.message.types.IMessage;
 
 public class Route implements IRoute {
 

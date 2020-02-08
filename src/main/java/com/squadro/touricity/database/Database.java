@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.*;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Database {
 

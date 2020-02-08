@@ -1,5 +1,6 @@
 package com.squadro.touricity.message.types.data;
 
+import com.squadro.touricity.message.types.IMessage;
 import com.squadro.touricity.message.types.data.enumeration.PathType;
 
 public class Path extends Entry implements IPath {

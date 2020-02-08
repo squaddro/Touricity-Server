@@ -1,5 +1,6 @@
 package com.squadro.touricity.controller.mock;
 
+import com.squadro.touricity.message.types.IMessage;
 import com.squadro.touricity.message.types.data.IEntry;
 import com.squadro.touricity.message.types.data.Path;
 import com.squadro.touricity.message.types.data.Route;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class RouteController {
 
     @RequestMapping(value = "/mock/route", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Route route(@RequestParam(value="random", defaultValue="false") String random) {
+    public IMessage route(@RequestParam(value="random", defaultValue="false") String random) {
         String creator = "";
         String routeId = "";
         IEntry[] entries = null;

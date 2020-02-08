@@ -1,6 +1,6 @@
 package com.squadro.touricity.message.types;
 
-public class Greeting {
+public class Greeting implements IMessage {
 	private final String content;
 	private final String joke;
 
