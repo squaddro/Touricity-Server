@@ -1,10 +1,11 @@
 package com.squadro.touricity.message.types.data;
 
+import com.squadro.touricity.message.types.IMessage;
 
-public class Stop extends Entry implements IStop{
+public class Stop extends Entry implements IStop {
 
-	public String location_id;
-	public String stop_id;
+	private String location_id;
+	private String stop_id;
 	
 	public Stop(){
 		

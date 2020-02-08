@@ -1,5 +1,6 @@
 package com.squadro.touricity.controller.mock;
 
+import com.squadro.touricity.message.types.IMessage;
 import com.squadro.touricity.message.types.data.Path;
 import com.squadro.touricity.message.types.data.enumeration.PathType;
 import org.springframework.http.MediaType;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PathController {
 
     @RequestMapping(value = "/mock/path", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Path path(@RequestParam(value="random", defaultValue="false") String random) {
+    public IMessage path(@RequestParam(value="random", defaultValue="false") String random) {
         String pathId = "";
         int pathType = 0;
         int expense = 0;

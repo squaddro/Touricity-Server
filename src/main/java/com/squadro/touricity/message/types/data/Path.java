@@ -1,12 +1,13 @@
 package com.squadro.touricity.message.types.data;
 
+import com.squadro.touricity.message.types.IMessage;
 import com.squadro.touricity.message.types.data.enumeration.PathType;
 
 public class Path extends Entry implements IPath {
 
-	public String path_id;
-	public PathType path_type;
-	public PathVertex[] vertices;
+	private String path_id;
+	private PathType path_type;
+	private PathVertex[] vertices;
 	
 	public Path(){
 		

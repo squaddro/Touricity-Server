@@ -1,12 +1,15 @@
 package com.squadro.touricity.message.types.data;
 
 
+import com.squadro.touricity.message.types.IMessage;
+
 public class Location implements ILocation {
 
 	private String location_id;
+	private String cityId;
 	private double latitude;
 	private double longitude;
-	
+
 	public Location(){
 	}
 	
@@ -28,6 +31,10 @@ public class Location implements ILocation {
 		return longitude;
 	}
 
+	public String getCity_id() {
+		return cityId;
+	}
+
 	public void setLocation_id(String locationId) {
         location_id = locationId;		
 	}
@@ -38,6 +45,10 @@ public class Location implements ILocation {
 
 	public void setLongitude(double longitude) {
 		this.longitude = longitude;
+	}
+
+	public void setCity_id(String cityId) {
+		this.cityId = cityId;
 	}
 
 }

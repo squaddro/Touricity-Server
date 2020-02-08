@@ -1,5 +1,7 @@
 package com.squadro.touricity.message.types.data;
 
-public interface IDataType {
+import com.squadro.touricity.message.types.IMessage;
+
+public interface IDataType extends IMessage {
 
 }

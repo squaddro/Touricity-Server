@@ -1,5 +1,6 @@
 package com.squadro.touricity.controller.mock;
 
+import com.squadro.touricity.message.types.IMessage;
 import com.squadro.touricity.message.types.data.Stop;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class StopController {
 
     @RequestMapping(value = "/mock/stop", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Stop stop(@RequestParam(value="random", defaultValue="false") String random) {
+    public IMessage stop(@RequestParam(value="random", defaultValue="false") String random) {
         String stopId = "";
         String locationId = "";
         int expense = 0;

@@ -1,5 +1,6 @@
 package com.squadro.touricity.controller.mock;
 
+import com.squadro.touricity.message.types.IMessage;
 import com.squadro.touricity.message.types.data.Location;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class LocationController {
 
     @RequestMapping(value = "/mock/location", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Location location(@RequestParam(value="random", defaultValue="false") String random) {
+    public IMessage location(@RequestParam(value="random", defaultValue="false") String random) {
         String locationId = "";
         double latitude = 0;
         double longitude = 0;

@@ -1,3 +1,14 @@
+DROP TABLE IF EXISTS DB_ACCOUNT;
+DROP TABLE IF EXISTS DB_USER;
+DROP TABLE IF EXISTS DB_SESSION;
+DROP TABLE IF EXISTS DB_ROUTE;
+DROP TABLE IF EXISTS DB_ENTRY;
+DROP TABLE IF EXISTS DB_STOP;
+DROP TABLE IF EXISTS DB_PATH;
+DROP TABLE IF EXISTS DB_LOCATION;
+DROP TABLE IF EXISTS DB_LIKE;
+DROP TABLE IF EXISTS DB_COMMENT;
+DROP TABLE IF EXISTS DB_CITY;
 
 CREATE TABLE DB_ACCOUNT (
        Account_Id char(36)
@@ -16,7 +27,11 @@ CREATE TABLE DB_SESSION (
 
 CREATE TABLE DB_ROUTE (
        Creator char(36),
-       Route_Id char(36)
+       Route_Id char(36),
+       City_Id char(36),
+       Title varchar(70),
+       Route_Desc varchar(1000),
+       Privacy integer
 );
 
 CREATE TABLE DB_ENTRY (
@@ -42,8 +57,9 @@ CREATE TABLE DB_STOP (
 
 CREATE TABLE DB_LOCATION (
        Location_Id char(36),
-       Latitude char(36),
-       Longitude char(36)
+       City_Id char(36),
+       Latitude double precision,
+       Longitude double precision
 );
 
 CREATE TABLE DB_LIKE (
@@ -56,6 +72,11 @@ CREATE TABLE DB_COMMENT (
        Account_Id char(36),
        Comment_Id char(36),
        Comment_desc varchar(1000)
+);
+
+CREATE TABLE DB_CITY (
+        City_Id char(36),
+        City_Name varchar(100)
 );
 
 CREATE TABLE DB_LOCATION_LIKE (
@@ -77,7 +98,6 @@ CREATE TABLE DB_ROUTE_COMMENT (
        Route_Id char(36),
        Comment_Id char(36)
 );
-
 
 ALTER TABLE DB_ACCOUNT
 ADD CONSTRAINT ACCOUNT_PK
@@ -114,6 +134,10 @@ PRIMARY KEY (Like_Id);
 ALTER TABLE DB_COMMENT
 ADD CONSTRAINT COMMENT_PK 
 PRIMARY KEY (Comment_Id);
+
+ALTER TABLE DB_CITY
+ADD CONSTRAINT CITY_PK
+PRIMARY KEY (City_Id);
 	 
 ALTER TABLE DB_USER 
 ADD CONSTRAINT Account_Id_FK
@@ -131,6 +155,12 @@ ALTER TABLE DB_ROUTE
 ADD CONSTRAINT User_Id_FK
 FOREIGN KEY (Creator)
 REFERENCES DB_ACCOUNT(Account_Id)
+ON DELETE CASCADE;
+
+ALTER TABLE DB_ROUTE
+ADD CONSTRAINT Route_City_Id_FK
+FOREIGN KEY (City_Id)
+REFERENCES DB_CITY(City_Id)
 ON DELETE CASCADE;
 
 ALTER TABLE DB_ENTRY
