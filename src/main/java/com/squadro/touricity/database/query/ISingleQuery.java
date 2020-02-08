@@ -5,6 +5,7 @@ import com.squadro.touricity.database.result.QueryResult;
 
 public interface ISingleQuery{
 
+	void execute();
 
 	ExecutionType getExecutionType();
 	String getQuery();

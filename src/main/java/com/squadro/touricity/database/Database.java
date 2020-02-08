@@ -4,6 +4,8 @@ import com.squadro.touricity.database.query.SelectionQuery;
 import com.squadro.touricity.database.query.pipeline.IPipelinedQuery;
 import com.squadro.touricity.database.query.ISingleQuery;
 import com.squadro.touricity.database.result.QueryResult;
+import com.squadro.touricity.session.RequestInterceptor;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
@@ -14,6 +16,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class Database {
 
 	private static Database instance;
+	private static final Logger logger = LoggerFactory.getLogger(Database.class);
 
 	private final static String ENVIRONMENT_DATABASE_URL = "DB_URL";
 
@@ -99,6 +102,7 @@ public class Database {
 
 	private boolean executeQuery(ISingleQuery query) {
 		String queryStr = query.getQuery();
+		logger.info("Execute: " + queryStr);
 		try {
 			Connection conn = connect();
 			PreparedStatement stmt = conn.prepareStatement(queryStr);
@@ -124,6 +128,7 @@ public class Database {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			query.onError("Query: " + queryStr + " Error: " + e.toString());
+			logger.info("Query error: " + e.toString());
 			return false;
 		}
 	}
@@ -149,18 +154,22 @@ public class Database {
 			}
 
 			public boolean onResult(QueryResult result) {
-				LoggerFactory.getLogger(Database.class).info("Connected to the database!");
+				logger.info("Connected to the database!");
 				connectionCheck.set(true);
 				return false;
 			}
 
 			@Override
 			public void onError(String e) {
-				LoggerFactory.getLogger(Database.class).error("Couldn't connect to the database!");
+				logger.error("Couldn't connect to the database!");
 				connectionCheck.set(false);
 			}
 		});
 
 		return connectionCheck.get();
+	}
+
+	public static String value(String content) {
+		return "'" + content + "'";
 	}
 }

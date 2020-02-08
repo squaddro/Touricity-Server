@@ -1,5 +1,6 @@
 package com.squadro.touricity.database.query;
 
+import com.squadro.touricity.database.Database;
 import com.squadro.touricity.database.ExecutionType;
 
 public abstract class DeletionQuery implements ISingleQuery {
@@ -9,5 +10,9 @@ public abstract class DeletionQuery implements ISingleQuery {
 
 	public void onError(String e) {
 		System.err.println("Error occurred while deleting database: " + e);
+	}
+
+	public void execute() {
+		Database.execute(this);
 	}
 }
