@@ -3,7 +3,10 @@ package com.squadro.touricity.database;
 import com.squadro.touricity.database.query.SelectionQuery;
 import com.squadro.touricity.database.query.pipeline.IPipelinedQuery;
 import com.squadro.touricity.database.query.ISingleQuery;
+import com.squadro.touricity.database.query.pipeline.PipelinedQuery;
 import com.squadro.touricity.database.result.QueryResult;
+import com.squadro.touricity.message.types.data.*;
+import com.squadro.touricity.message.types.data.enumeration.PathType;
 import com.squadro.touricity.session.RequestInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +14,9 @@ import org.slf4j.LoggerFactory;
 import java.sql.*;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 
 public class Database {
 
@@ -86,7 +91,7 @@ public class Database {
 		databaseUrl = System.getenv(ENVIRONMENT_DATABASE_URL);
 	}
 
-	private Connection connect() throws SQLException {
+    private Connection connect() throws SQLException {
 		return DriverManager.getConnection(databaseUrl);
 	}
 
@@ -172,4 +177,163 @@ public class Database {
 	public static String value(String content) {
 		return "'" + content + "'";
 	}
+
+	public static Route getRouteInfo(String route_id) {
+
+		final AtomicReference<String> id = null;
+		final AtomicReference<String> creator = null;
+		final AtomicReference<String> city_id = null;
+		final AtomicReference<String> title = null;
+		final AtomicReferenceArray<IEntry> stops  = null;
+		final AtomicReferenceArray<IEntry> paths  = null;
+		final AtomicInteger privacy = null;
+
+		id.set(route_id);
+
+		getInstance().execute(new PipelinedQuery(){
+
+			protected void PrepareQueue(Queue<ISingleQuery> queue) {
+
+				queue.add(new SelectionQuery() {
+					public String getQuery() {
+
+						String routeIdQuery = "SELECT * FROM DB_ROUTE WHERE ROUTE_ID = " + id.get();
+						return routeIdQuery;
+					}
+
+					public boolean onResult(QueryResult result) throws SQLException {
+
+						ResultSet rs = result.getResultSet();
+
+						creator.set(rs.getString(ROUTE_CREATOR));
+						city_id.set(rs.getString(CITY_CITY_ID));
+						title.set(rs.getString(ROUTE_TITLE));
+						privacy.set(rs.getInt(ROUTE_PRIVACY));
+
+						return true;
+					}
+				});
+
+				//stops ->
+
+				queue.add(new SelectionQuery() {
+					public String getQuery() {
+						String stopQuery = "SELECT EXPENSE,DURATION,COMMENT_DESC,STOP_ID FROM ENTRY WHERE ROUTE_ID = " + id.get() + "AND STOP_ID IS NOT NULL";
+						return stopQuery;
+					}
+
+					public boolean onResult(QueryResult result) throws SQLException {
+						ResultSet rs = result.getResultSet();
+
+						Stop tmpStop;
+
+						while(rs.next()){
+							tmpStop = new Stop();
+							tmpStop.setStop_id(rs.getString(STOP_STOP_ID));
+							tmpStop.setExpense(rs.getInt(ENTRY_EXPENSE));
+							tmpStop.setDuration(rs.getInt(ENTRY_DURATION));
+							tmpStop.setComment(rs.getString(ENTRY_COMMENT_DESCRIPTION));
+							tmpStop.setIndex(rs.getInt("index"));
+
+							stops.set(stops.length() , tmpStop);
+							tmpStop = null;
+						}
+
+						return true;
+					}
+				});
+
+				final AtomicInteger stopCounter = null;
+				stopCounter.set(0);
+				while(stopCounter.get() < stops.length()){
+
+					queue.add(new SelectionQuery() {
+						public String getQuery() {
+							String stop_locationIdQuery = "SELECT LOCATION_ID FROM DB_STOP WHERE STOP_ID = " + ((Stop) stops.get(stopCounter.get())).getStop_id();
+							return stop_locationIdQuery;
+						}
+
+						public boolean onResult(QueryResult result) throws SQLException {
+
+							ResultSet rs = result.getResultSet();
+							((Stop)(stops.get(stopCounter.get()))).setLocation_id(rs.getString(STOP_LOCATION_ID));
+							return true;
+						}
+					});
+
+					stopCounter.set(stopCounter.get()+1);
+				}
+
+				//////paths ->
+
+				queue.add(new SelectionQuery() {
+					public String getQuery() {
+						String pathQuery = "SELECT EXPENSE,DURATION,COMMENT_DESC,PATH_ID FROM ENTRY WHERE ROUTE_ID = " + id.get() + "AND PATH_ID IS NOT NULL";
+						return pathQuery;
+					}
+
+					public boolean onResult(QueryResult result) throws SQLException {
+						ResultSet rs = result.getResultSet();
+
+						Path tmpPath;
+
+						while(rs.next()){
+							tmpPath = new Path();
+							tmpPath.setPath_id(rs.getString(PATH_PATH_ID));
+							tmpPath.setExpense(rs.getInt(ENTRY_EXPENSE));
+							tmpPath.setDuration(rs.getInt(ENTRY_DURATION));
+							tmpPath.setComment(rs.getString(ENTRY_COMMENT_DESCRIPTION));
+							tmpPath.setIndex(rs.getInt("index"));
+
+							//TODO: if check for empty array (lenght == 0)
+							paths.set(paths.length() , tmpPath);
+							tmpPath = null;
+						}
+
+						return true;
+					}
+				});
+
+				final AtomicInteger pathCounter = null;
+				pathCounter.set(0);
+				while(pathCounter.get() < paths.length()){
+
+					queue.add(new SelectionQuery() {
+						public String getQuery() {
+							String pathType_VerticesQuery = "SELECT PATH_TYPE, VERTICES FROM DB_PATH WHERE PATH_ID = " + ((Path) paths.get(pathCounter.get())).getPath_id();
+							return pathType_VerticesQuery;
+						}
+
+						public boolean onResult(QueryResult result) throws SQLException {
+
+							ResultSet rs = result.getResultSet();
+							((Path)(paths.get(pathCounter.get()))).setPath_type(PathType.values()[rs.getInt(PATH_PATH_TYPE)]);
+							((Path)(paths.get(pathCounter.get()))).setVertices(byteArrayToVerticesArray(rs.getBytes(PATH_VERTICES)));  //PathType.values()[rs.getInt(PATH_PATH_TYPE)]
+							return true;
+						}
+					});
+					pathCounter.set(pathCounter.get()+1);
+				}
+			}
+		});
+
+		//TODO: add index for entries.
+		//TODO: sort the entries based on index values into an Entry array.
+		//TODO: assemble the attributes of the route and return it.
+		//TODO: wrote it when I was sleepy, test the code properly.
+
+
+		return null;
+	}
+
+	private static IPath.PathVertex[] byteArrayToVerticesArray(byte[] bytes){
+
+		//TODO: implement this.
+		return null;
+	}
+
+
+
+
+
 }
