@@ -324,7 +324,7 @@ public class Database {
 
 				queue.add(new SelectionQuery() {
 					public String getQuery() {
-						String stopQuery = "SELECT EXPENSE,DURATION,COMMENT_DESC,STOP_ID,INDEX FROM ENTRY WHERE ROUTE_ID = " + id.get() + "AND STOP_ID IS NOT NULL ORDER BY INDEX ASC";
+						String stopQuery = "SELECT EXPENSE,DURATION,COMMENT_DESC,STOP_ID,POINTER FROM ENTRY WHERE ROUTE_ID = " + id.get() + "AND STOP_ID IS NOT NULL ORDER BY POINTER ASC";
 						return stopQuery;
 					}
 
@@ -339,7 +339,7 @@ public class Database {
 							tmpStop.setExpense(rs.getInt(ENTRY_EXPENSE));
 							tmpStop.setDuration(rs.getInt(ENTRY_DURATION));
 							tmpStop.setComment(rs.getString(ENTRY_COMMENT_DESCRIPTION));
-							tmpStop.setIndex(rs.getInt("index"));
+							tmpStop.setIndex(rs.getInt("POINTER"));
 
 
 							stops.set(stopsLength.get() , tmpStop);
@@ -375,7 +375,7 @@ public class Database {
 
 				queue.add(new SelectionQuery() {
 					public String getQuery() {
-						String pathQuery = "SELECT EXPENSE,DURATION,COMMENT_DESC,PATH_ID,INDEX FROM ENTRY WHERE ROUTE_ID = " + id.get() + "AND PATH_ID IS NOT NULL ORDER BY INDEX ASC";
+						String pathQuery = "SELECT EXPENSE,DURATION,COMMENT_DESC,PATH_ID,POINTER FROM ENTRY WHERE ROUTE_ID = " + id.get() + "AND PATH_ID IS NOT NULL ORDER BY POINTER ASC";
 						return pathQuery;
 					}
 
@@ -390,7 +390,7 @@ public class Database {
 							tmpPath.setExpense(rs.getInt(ENTRY_EXPENSE));
 							tmpPath.setDuration(rs.getInt(ENTRY_DURATION));
 							tmpPath.setComment(rs.getString(ENTRY_COMMENT_DESCRIPTION));
-							tmpPath.setIndex(rs.getInt("index"));
+							tmpPath.setIndex(rs.getInt("POINTER"));
 
 							paths.set(pathsLength.get() , tmpPath);
 							tmpPath = null;
