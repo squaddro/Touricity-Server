@@ -15,10 +15,13 @@ public class Route implements IRoute {
 		//do nothing
 	}
 	
-	public Route(String creator, String route_id, IEntry[] entries){
+	public Route(String creator, String route_id, IEntry[] entries, String cityId, String title, int privacy){
 		this.creator = creator;
 		this.route_id = route_id;
 		this.entries = entries;
+		this.cityId = cityId;
+		this.title = title;
+		this.privacy = privacy;
 	}
 	
 	public String getCreator() {

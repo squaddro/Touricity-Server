@@ -3,17 +3,28 @@ package com.squadro.touricity.database;
 import com.squadro.touricity.database.query.ISingleQuery;
 import com.squadro.touricity.database.query.SelectionQuery;
 import com.squadro.touricity.database.query.pipeline.IPipelinedQuery;
+import com.squadro.touricity.database.query.ISingleQuery;
+import com.squadro.touricity.database.query.pipeline.PipelinedQuery;
 import com.squadro.touricity.database.result.QueryResult;
+import com.squadro.touricity.message.types.data.*;
+import com.squadro.touricity.message.types.data.enumeration.PathType;
+import com.squadro.touricity.session.RequestInterceptor;
 import com.squadro.touricity.message.types.data.Filter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 
 public class Database {
 
@@ -88,7 +99,7 @@ public class Database {
 		databaseUrl = System.getenv(ENVIRONMENT_DATABASE_URL);
 	}
 
-	private Connection connect() throws SQLException {
+    private Connection connect() throws SQLException {
 		return DriverManager.getConnection(databaseUrl);
 	}
 
@@ -102,7 +113,7 @@ public class Database {
 		return instance;
 	}
 
-	private boolean executeQuery(ISingleQuery query) {
+	private boolean executeQuery(ISingleQuery query) throws IOException, ClassNotFoundException {
 		String queryStr = query.getQuery();
 		logger.info("Execute: " + queryStr);
 		try {
@@ -135,11 +146,11 @@ public class Database {
 		}
 	}
 
-	public static void execute(ISingleQuery query) {
+	public static void execute(ISingleQuery query) throws IOException, ClassNotFoundException {
 		getInstance().executeQuery(query);
 	}
 
-	public static void execute(IPipelinedQuery query) {
+	public static void execute(IPipelinedQuery query) throws IOException, ClassNotFoundException {
 		Queue<ISingleQuery> queue = query.getQueries();
 		while (!queue.isEmpty()) {
 			if (!getInstance().executeQuery(queue.poll()))
@@ -147,7 +158,7 @@ public class Database {
 		}
 	}
 
-	public static boolean checkConnection() {
+	public static boolean checkConnection() throws IOException, ClassNotFoundException {
 		final AtomicBoolean connectionCheck = new AtomicBoolean();
 
 		getInstance().execute(new SelectionQuery() {
@@ -258,8 +269,8 @@ public class Database {
 				String cityQuery = "SELECT city_id FROM DB_CITY WHERE " + "city_name" + "=" + city.toUpperCase();
 				return "SELECT route_id FROM DB_ROUTE WHERE " + "(" + cityQuery + ") AND privacy = 0";
 			}
-
 			public boolean onResult(QueryResult result) throws SQLException {
+
 				while (result.getResultSet().next()) {
 					list.add(result.getResultSet().getString("route_id"));
 				}
@@ -268,4 +279,197 @@ public class Database {
 		});
 		return list;
 	}
+
+	public static Route getRouteInfo(String route_id) throws IOException, ClassNotFoundException {
+
+		final AtomicInteger pathsLength = new AtomicInteger(0);
+		final AtomicInteger stopsLength = new AtomicInteger(0);
+
+		final AtomicReference<String> id = new AtomicReference<String>();
+		final AtomicReference<String> creator = new AtomicReference<String>();
+		final AtomicReference<String> city_id = new AtomicReference<String>();
+		final AtomicReferenceArray<IEntry> stops  = new AtomicReferenceArray<IEntry>(50);
+		final AtomicReference<String> title = new AtomicReference<String>();
+		final AtomicReferenceArray<IEntry> paths  = new AtomicReferenceArray<IEntry>(50);
+		final AtomicInteger privacy = new AtomicInteger();
+		final AtomicReferenceArray<IEntry> entries = new AtomicReferenceArray<IEntry>(100);
+
+		id.set(route_id);
+
+		getInstance().execute(new PipelinedQuery(){
+
+			protected void PrepareQueue(Queue<ISingleQuery> queue) {
+
+				queue.add(new SelectionQuery() {
+
+					public String getQuery() {
+						String routeIdQuery = "SELECT * FROM DB_ROUTE WHERE ROUTE_ID = " + id.get();
+						return routeIdQuery;
+					}
+
+					public boolean onResult(QueryResult result) throws SQLException {
+
+						ResultSet rs = result.getResultSet();
+
+						creator.set(rs.getString(ROUTE_CREATOR));
+						title.set(rs.getString(ROUTE_TITLE));
+						city_id.set(rs.getString(CITY_CITY_ID));
+						privacy.set(rs.getInt(ROUTE_PRIVACY));
+
+						return true;
+					}
+				});
+
+				//stops ->
+
+				queue.add(new SelectionQuery() {
+					public String getQuery() {
+						String stopQuery = "SELECT EXPENSE,DURATION,COMMENT_DESC,STOP_ID,INDEX FROM ENTRY WHERE ROUTE_ID = " + id.get() + "AND STOP_ID IS NOT NULL ORDER BY INDEX ASC";
+						return stopQuery;
+					}
+
+					public boolean onResult(QueryResult result) throws SQLException {
+						ResultSet rs = result.getResultSet();
+						Stop tmpStop;
+
+
+						while(rs.next()){
+							tmpStop = new Stop();
+							tmpStop.setStop_id(rs.getString(STOP_STOP_ID));
+							tmpStop.setExpense(rs.getInt(ENTRY_EXPENSE));
+							tmpStop.setDuration(rs.getInt(ENTRY_DURATION));
+							tmpStop.setComment(rs.getString(ENTRY_COMMENT_DESCRIPTION));
+							tmpStop.setIndex(rs.getInt("index"));
+
+
+							stops.set(stopsLength.get() , tmpStop);
+							stopsLength.set(stopsLength.get() + 1);
+							tmpStop = null;
+						}
+
+						return true;
+					}
+				});
+
+				final AtomicInteger stopCounter = new AtomicInteger(0);
+				while(stopCounter.get() < stopsLength.get()){
+
+					queue.add(new SelectionQuery() {
+						public String getQuery() {
+							String stop_locationIdQuery = "SELECT LOCATION_ID FROM DB_STOP WHERE STOP_ID = " + ((Stop) stops.get(stopCounter.get())).getStop_id();
+							return stop_locationIdQuery;
+						}
+
+						public boolean onResult(QueryResult result) throws SQLException {
+
+							ResultSet rs = result.getResultSet();
+							((Stop)(stops.get(stopCounter.get()))).setLocation_id(rs.getString(STOP_LOCATION_ID));
+							return true;
+						}
+					});
+
+					stopCounter.set(stopCounter.get()+1);
+				}
+
+				//////paths ->
+
+				queue.add(new SelectionQuery() {
+					public String getQuery() {
+						String pathQuery = "SELECT EXPENSE,DURATION,COMMENT_DESC,PATH_ID,INDEX FROM ENTRY WHERE ROUTE_ID = " + id.get() + "AND PATH_ID IS NOT NULL ORDER BY INDEX ASC";
+						return pathQuery;
+					}
+
+					public boolean onResult(QueryResult result) throws SQLException {
+						ResultSet rs = result.getResultSet();
+
+						Path tmpPath;
+
+						while(rs.next()){
+							tmpPath = new Path();
+							tmpPath.setPath_id(rs.getString(PATH_PATH_ID));
+							tmpPath.setExpense(rs.getInt(ENTRY_EXPENSE));
+							tmpPath.setDuration(rs.getInt(ENTRY_DURATION));
+							tmpPath.setComment(rs.getString(ENTRY_COMMENT_DESCRIPTION));
+							tmpPath.setIndex(rs.getInt("index"));
+
+							paths.set(pathsLength.get() , tmpPath);
+							tmpPath = null;
+						}
+
+						return true;
+					}
+				});
+
+				final AtomicInteger pathCounter = new AtomicInteger(0);
+				while(pathCounter.get() < pathsLength.get()){
+
+					queue.add(new SelectionQuery() {
+						public String getQuery() {
+							String pathType_VerticesQuery = "SELECT PATH_TYPE, VERTICES FROM DB_PATH WHERE PATH_ID = " + ((Path) paths.get(pathCounter.get())).getPath_id();
+							return pathType_VerticesQuery;
+						}
+
+						public boolean onResult(QueryResult result) throws SQLException, IOException, ClassNotFoundException {
+
+							ResultSet rs = result.getResultSet();
+							((Path)(paths.get(pathCounter.get()))).setPath_type(PathType.values()[rs.getInt(PATH_PATH_TYPE)]);
+							((Path)(paths.get(pathCounter.get()))).setVertices(byteArrayToVerticesArray(rs.getBytes(PATH_VERTICES)));
+							return true;
+						}
+					});
+					pathCounter.set(pathCounter.get()+1);
+				}
+			}
+		});
+
+		if(stops.get(0).getIndex() == 0){
+
+			for(int i = 0; i < stopsLength.get() + pathsLength.get() ; i++){
+				int j = 0; //counter for stops.
+				int k = 0; //counter for paths.
+
+				if(i % 2 == 0){
+					entries.set(i, stops.get(j));
+					j++;
+				}
+				else{
+					entries.set(i,paths.get(k));
+					k++;
+				}
+			}
+		}
+		else if(paths.get(0).getIndex() == 0){
+
+			for(int i = 0; i < stopsLength.get() + pathsLength.get() ; i++){
+				int j = 0; //counter for paths.
+				int k = 0; //counter for stops.
+
+				if(i % 2 == 0){
+					entries.set(i, paths.get(j));
+					j++;
+				}
+				else{
+					entries.set(i,stops.get(k));
+					k++;
+				}
+			}
+		}
+
+		IEntry[] entries2return = new IEntry[entries.length()];
+
+		for(int i = 0; i < stopsLength.get() + pathsLength.get() ; i++){
+			entries2return[i] = entries.get(i);
+		}
+
+		Route route = new Route(creator.get(), id.get(), entries2return, city_id.get(), title.get(), privacy.get());
+
+		return route;
+	}
+
+	private static IPath.PathVertex[] byteArrayToVerticesArray(byte[] bytes) throws IOException, ClassNotFoundException {
+		ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+		ObjectInputStream is = new ObjectInputStream(in);
+		return (IPath.PathVertex[]) is.readObject();
+	}
+	
 }
