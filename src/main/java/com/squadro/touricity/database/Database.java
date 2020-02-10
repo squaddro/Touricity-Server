@@ -108,7 +108,7 @@ public class Database {
 		return instance;
 	}
 
-	private boolean executeQuery(ISingleQuery query) {
+	private boolean executeQuery(ISingleQuery query) throws IOException, ClassNotFoundException {
 		String queryStr = query.getQuery();
 		logger.info("Execute: " + queryStr);
 		try {
@@ -141,11 +141,11 @@ public class Database {
 		}
 	}
 
-	public static void execute(ISingleQuery query) {
+	public static void execute(ISingleQuery query) throws IOException, ClassNotFoundException {
 		getInstance().executeQuery(query);
 	}
 
-	public static void execute(IPipelinedQuery query) {
+	public static void execute(IPipelinedQuery query) throws IOException, ClassNotFoundException {
 		Queue<ISingleQuery> queue = query.getQueries();
 		while(!queue.isEmpty()) {
 			if(!getInstance().executeQuery(queue.poll()))
@@ -153,7 +153,7 @@ public class Database {
 		}
 	}
 
-	public static boolean checkConnection() {
+	public static boolean checkConnection() throws IOException, ClassNotFoundException {
 		final AtomicBoolean connectionCheck = new AtomicBoolean();
 
 		getInstance().execute(new SelectionQuery() {
@@ -181,14 +181,15 @@ public class Database {
 		return "'" + content + "'";
 	}
 
-	public static Route getRouteInfo(String route_id) {
+	public static Route getRouteInfo(String route_id) throws IOException, ClassNotFoundException {
 
 		final AtomicReference<String> id = null;
 		final AtomicReference<String> creator = null;
 		final AtomicReference<String> city_id = null;
 		final AtomicReference<String> title = null;
-		final AtomicReferenceArray<IEntry> stops  = null;
-		final AtomicReferenceArray<IEntry> paths  = null;
+		final AtomicReferenceArray<IEntry> stops  = new AtomicReferenceArray<IEntry>(50);
+		final AtomicReferenceArray<IEntry> paths  = new AtomicReferenceArray<IEntry>(50);
+		final AtomicReferenceArray<IEntry> entries = new AtomicReferenceArray<IEntry>(100);
 		final AtomicInteger privacy = null;
 
 		id.set(route_id);
@@ -221,7 +222,7 @@ public class Database {
 
 				queue.add(new SelectionQuery() {
 					public String getQuery() {
-						String stopQuery = "SELECT EXPENSE,DURATION,COMMENT_DESC,STOP_ID FROM ENTRY WHERE ROUTE_ID = " + id.get() + "AND STOP_ID IS NOT NULL";
+						String stopQuery = "SELECT EXPENSE,DURATION,COMMENT_DESC,STOP_ID,INDEX FROM ENTRY WHERE ROUTE_ID = " + id.get() + "AND STOP_ID IS NOT NULL ORDER BY INDEX ASC";
 						return stopQuery;
 					}
 
@@ -271,7 +272,7 @@ public class Database {
 
 				queue.add(new SelectionQuery() {
 					public String getQuery() {
-						String pathQuery = "SELECT EXPENSE,DURATION,COMMENT_DESC,PATH_ID FROM ENTRY WHERE ROUTE_ID = " + id.get() + "AND PATH_ID IS NOT NULL";
+						String pathQuery = "SELECT EXPENSE,DURATION,COMMENT_DESC,PATH_ID,INDEX FROM ENTRY WHERE ROUTE_ID = " + id.get() + "AND PATH_ID IS NOT NULL ORDER BY INDEX ASC";
 						return pathQuery;
 					}
 
@@ -288,7 +289,6 @@ public class Database {
 							tmpPath.setComment(rs.getString(ENTRY_COMMENT_DESCRIPTION));
 							tmpPath.setIndex(rs.getInt("index"));
 
-							//TODO: if check for empty array (lenght == 0)
 							paths.set(paths.length() , tmpPath);
 							tmpPath = null;
 						}
@@ -307,7 +307,7 @@ public class Database {
 							return pathType_VerticesQuery;
 						}
 
-						public boolean onResult(QueryResult result) throws SQLException {
+						public boolean onResult(QueryResult result) throws SQLException, IOException, ClassNotFoundException {
 
 							ResultSet rs = result.getResultSet();
 							((Path)(paths.get(pathCounter.get()))).setPath_type(PathType.values()[rs.getInt(PATH_PATH_TYPE)]);
@@ -320,13 +320,50 @@ public class Database {
 			}
 		});
 
-		//TODO: add index for entries.
-		//TODO: sort the entries based on index values into an Entry array.
-		//TODO: assemble the attributes of the route and return it.
-		//TODO: wrote it when I was sleepy, test the code properly.
+		if(stops.get(0).getIndex() == 0){
 
+			for(int i = 0; i <stopsLength + pathsLength ; i++){
+				int j = 0; //counter for stops.
+				int k = 0; //counter for paths.
 
-		return null;
+				if(i%2 == 0){
+					entries.set(i, stops.get(j));
+					j++;
+				}
+				else{
+					entries.set(i,paths.get(k));
+					k++;
+				}
+			}
+		}
+		else if(paths.get(0).getIndex() == 0){
+
+			for(int i = 0; i <stopsLength + pathsLength ; i++){
+				int j = 0; //counter for paths.
+				int k = 0; //counter for stops.
+
+				if(i%2 == 0){
+					entries.set(i, paths.get(j));
+					j++;
+				}
+				else{
+					entries.set(i,stops.get(k));
+					k++;
+				}
+			}
+		}
+
+		IEntry[] entries2return = new IEntry[entries.length()];
+
+		for(int i = 0; i<stops.length(); i++){
+			entries2return[i] = entries.get(i);
+		}
+
+		Route route = new Route(creator.get(), id.get(), entries2return, city_id.get(), title.get(), privacy.get());
+
+		//TODO: atomic arraylerin initializationlarını kontrol et.
+
+		return route;
 	}
 
 	private static IPath.PathVertex[] byteArrayToVerticesArray(byte[] bytes) throws IOException, ClassNotFoundException {
