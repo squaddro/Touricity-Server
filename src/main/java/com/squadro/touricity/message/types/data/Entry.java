@@ -6,6 +6,7 @@ public abstract class Entry implements IEntry {
     protected int duration;
     protected int expense;
     protected String comment;
+    protected int index;
 	
 
 	public int getDuration() {
@@ -32,4 +33,5 @@ public abstract class Entry implements IEntry {
 		this.comment = comment;
 	}
 
+    public void setIndex(int index){this.index = index;}
 }

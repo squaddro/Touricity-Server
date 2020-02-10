@@ -11,6 +11,9 @@ import com.squadro.touricity.session.RequestInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.sql.*;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -326,10 +329,10 @@ public class Database {
 		return null;
 	}
 
-	private static IPath.PathVertex[] byteArrayToVerticesArray(byte[] bytes){
-
-		//TODO: implement this.
-		return null;
+	private static IPath.PathVertex[] byteArrayToVerticesArray(byte[] bytes) throws IOException, ClassNotFoundException {
+		ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+		ObjectInputStream is = new ObjectInputStream(in);
+		return (IPath.PathVertex[]) is.readObject();
 	}
 
 
