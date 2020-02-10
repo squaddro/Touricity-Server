@@ -183,14 +183,17 @@ public class Database {
 
 	public static Route getRouteInfo(String route_id) throws IOException, ClassNotFoundException {
 
-		final AtomicReference<String> id = null;
-		final AtomicReference<String> creator = null;
-		final AtomicReference<String> city_id = null;
-		final AtomicReference<String> title = null;
+		final AtomicInteger pathsLength = new AtomicInteger(0);
+		final AtomicInteger stopsLength = new AtomicInteger(0);
+
+		final AtomicReference<String> id = new AtomicReference<String>();
+		final AtomicReference<String> creator = new AtomicReference<String>();
+		final AtomicReference<String> city_id = new AtomicReference<String>();
+		final AtomicReference<String> title = new AtomicReference<String>();
 		final AtomicReferenceArray<IEntry> stops  = new AtomicReferenceArray<IEntry>(50);
 		final AtomicReferenceArray<IEntry> paths  = new AtomicReferenceArray<IEntry>(50);
 		final AtomicReferenceArray<IEntry> entries = new AtomicReferenceArray<IEntry>(100);
-		final AtomicInteger privacy = null;
+		final AtomicInteger privacy = new AtomicInteger();
 
 		id.set(route_id);
 
@@ -239,7 +242,9 @@ public class Database {
 							tmpStop.setComment(rs.getString(ENTRY_COMMENT_DESCRIPTION));
 							tmpStop.setIndex(rs.getInt("index"));
 
-							stops.set(stops.length() , tmpStop);
+
+							stops.set(stopsLength.get() , tmpStop);
+							stopsLength.set(stopsLength.get() + 1);
 							tmpStop = null;
 						}
 
@@ -247,9 +252,8 @@ public class Database {
 					}
 				});
 
-				final AtomicInteger stopCounter = null;
-				stopCounter.set(0);
-				while(stopCounter.get() < stops.length()){
+				final AtomicInteger stopCounter = new AtomicInteger(0);
+				while(stopCounter.get() < stopsLength.get()){
 
 					queue.add(new SelectionQuery() {
 						public String getQuery() {
@@ -289,7 +293,7 @@ public class Database {
 							tmpPath.setComment(rs.getString(ENTRY_COMMENT_DESCRIPTION));
 							tmpPath.setIndex(rs.getInt("index"));
 
-							paths.set(paths.length() , tmpPath);
+							paths.set(pathsLength.get() , tmpPath);
 							tmpPath = null;
 						}
 
@@ -297,9 +301,8 @@ public class Database {
 					}
 				});
 
-				final AtomicInteger pathCounter = null;
-				pathCounter.set(0);
-				while(pathCounter.get() < paths.length()){
+				final AtomicInteger pathCounter = new AtomicInteger(0);
+				while(pathCounter.get() < pathsLength.get()){
 
 					queue.add(new SelectionQuery() {
 						public String getQuery() {
@@ -311,7 +314,7 @@ public class Database {
 
 							ResultSet rs = result.getResultSet();
 							((Path)(paths.get(pathCounter.get()))).setPath_type(PathType.values()[rs.getInt(PATH_PATH_TYPE)]);
-							((Path)(paths.get(pathCounter.get()))).setVertices(byteArrayToVerticesArray(rs.getBytes(PATH_VERTICES)));  //PathType.values()[rs.getInt(PATH_PATH_TYPE)]
+							((Path)(paths.get(pathCounter.get()))).setVertices(byteArrayToVerticesArray(rs.getBytes(PATH_VERTICES)));
 							return true;
 						}
 					});
@@ -322,11 +325,11 @@ public class Database {
 
 		if(stops.get(0).getIndex() == 0){
 
-			for(int i = 0; i <stopsLength + pathsLength ; i++){
+			for(int i = 0; i < stopsLength.get() + pathsLength.get() ; i++){
 				int j = 0; //counter for stops.
 				int k = 0; //counter for paths.
 
-				if(i%2 == 0){
+				if(i % 2 == 0){
 					entries.set(i, stops.get(j));
 					j++;
 				}
@@ -338,11 +341,11 @@ public class Database {
 		}
 		else if(paths.get(0).getIndex() == 0){
 
-			for(int i = 0; i <stopsLength + pathsLength ; i++){
+			for(int i = 0; i < stopsLength.get() + pathsLength.get() ; i++){
 				int j = 0; //counter for paths.
 				int k = 0; //counter for stops.
 
-				if(i%2 == 0){
+				if(i % 2 == 0){
 					entries.set(i, paths.get(j));
 					j++;
 				}
@@ -355,13 +358,11 @@ public class Database {
 
 		IEntry[] entries2return = new IEntry[entries.length()];
 
-		for(int i = 0; i<stops.length(); i++){
+		for(int i = 0; i < stopsLength.get() + pathsLength.get() ; i++){
 			entries2return[i] = entries.get(i);
 		}
 
 		Route route = new Route(creator.get(), id.get(), entries2return, city_id.get(), title.get(), privacy.get());
-
-		//TODO: atomic arraylerin initializationlarını kontrol et.
 
 		return route;
 	}
@@ -371,9 +372,5 @@ public class Database {
 		ObjectInputStream is = new ObjectInputStream(in);
 		return (IPath.PathVertex[]) is.readObject();
 	}
-
-
-
-
-
+	
 }
