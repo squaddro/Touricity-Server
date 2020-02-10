@@ -5,7 +5,6 @@ import com.squadro.touricity.database.query.SelectionQuery;
 import com.squadro.touricity.database.query.pipeline.IPipelinedQuery;
 import com.squadro.touricity.database.result.QueryResult;
 import com.squadro.touricity.message.types.data.Filter;
-import com.squadro.touricity.message.types.data.Route;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -175,16 +174,16 @@ public class Database {
 
     public static List<String> getRouteIdsFromFilter(Filter filter) {
 
-        final int averageCost = filter.getAverageCost();
-        final String city = filter.getCity();
+        final int expense = filter.getExpense();
+        final String city_name = filter.getCity_name();
         final int duration = filter.getDuration();
-        final int minRate = (int) filter.getMinRate();
-        final int transportation = filter.getTransportation();
+        final int score = (int) filter.getScore();
+        final int path_type = filter.getPath_type();
 
-        HashSet<String> routeIds = new HashSet<String>(getRouteIdsFromCity(city));
-        routeIds.retainAll(getRouteIdsFromCostAndDuration(averageCost, duration));
-        routeIds.retainAll(getRouteIdsFromLike(minRate));
-        routeIds.retainAll(getRouteIdsFromTransportation(transportation));
+        HashSet<String> routeIds = new HashSet<String>(getRouteIdsFromCity(city_name));
+        routeIds.retainAll(getRouteIdsFromCostAndDuration(expense, duration));
+        routeIds.retainAll(getRouteIdsFromLike(score));
+        routeIds.retainAll(getRouteIdsFromTransportation(path_type));
         return new ArrayList<String>(routeIds);
     }
 
