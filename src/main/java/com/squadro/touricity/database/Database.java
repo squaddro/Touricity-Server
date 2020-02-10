@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.sql.*;
 import java.util.ArrayList;
@@ -113,7 +112,7 @@ public class Database {
 		return instance;
 	}
 
-	private boolean executeQuery(ISingleQuery query) throws IOException, ClassNotFoundException {
+	private boolean executeQuery(ISingleQuery query){
 		String queryStr = query.getQuery();
 		logger.info("Execute: " + queryStr);
 		try {
@@ -146,11 +145,11 @@ public class Database {
 		}
 	}
 
-	public static void execute(ISingleQuery query) throws IOException, ClassNotFoundException {
+	public static void execute(ISingleQuery query) {
 		getInstance().executeQuery(query);
 	}
 
-	public static void execute(IPipelinedQuery query) throws IOException, ClassNotFoundException {
+	public static void execute(IPipelinedQuery query) {
 		Queue<ISingleQuery> queue = query.getQueries();
 		while (!queue.isEmpty()) {
 			if (!getInstance().executeQuery(queue.poll()))
@@ -158,7 +157,7 @@ public class Database {
 		}
 	}
 
-	public static boolean checkConnection() throws IOException, ClassNotFoundException {
+	public static boolean checkConnection() {
 		final AtomicBoolean connectionCheck = new AtomicBoolean();
 
 		getInstance().execute(new SelectionQuery() {
