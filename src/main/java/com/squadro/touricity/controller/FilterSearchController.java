@@ -1,6 +1,7 @@
 package com.squadro.touricity.controller;
 
 import com.squadro.touricity.database.Database;
+import com.squadro.touricity.message.types.IMessage;
 import com.squadro.touricity.message.types.data.Filter;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -16,13 +17,10 @@ public class FilterSearchController {
 			consumes = MediaType.APPLICATION_JSON_VALUE
 	)
 	@ResponseBody
-	public List<String> filter(
+	public IMessage filter(
 			@RequestBody Filter filter,
 			@CookieValue(value = "cookie_uuid", defaultValue = "notset") String cookie
 	) {
-		List<String> routeIdsFromFilter = Database.getRouteIdsFromFilter(filter);
-		return routeIdsFromFilter;
-		//Later, when getting route from route_id method is implemented, this request will return
-		//list of routes,for now it returns list of route_ids.
+		return Database.getRouteIdsFromFilter(filter);
 	}
 }
