@@ -1,5 +1,6 @@
 package com.squadro.touricity.database;
 
+import com.squadro.touricity.database.query.ISingleQuery;
 import com.squadro.touricity.database.query.SelectionQuery;
 import com.squadro.touricity.database.query.pipeline.IPipelinedQuery;
 import com.squadro.touricity.database.query.ISingleQuery;
@@ -8,6 +9,7 @@ import com.squadro.touricity.database.result.QueryResult;
 import com.squadro.touricity.message.types.data.*;
 import com.squadro.touricity.message.types.data.enumeration.PathType;
 import com.squadro.touricity.session.RequestInterceptor;
+import com.squadro.touricity.message.types.data.Filter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +17,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -99,9 +104,9 @@ public class Database {
 	}
 
 	public static Database getInstance() {
-		if(instance == null) {
+		if (instance == null) {
 			synchronized (Database.class) {
-				if(instance==null)
+				if (instance == null)
 					instance = new Database();
 			}
 		}
@@ -147,8 +152,8 @@ public class Database {
 
 	public static void execute(IPipelinedQuery query) throws IOException, ClassNotFoundException {
 		Queue<ISingleQuery> queue = query.getQueries();
-		while(!queue.isEmpty()) {
-			if(!getInstance().executeQuery(queue.poll()))
+		while (!queue.isEmpty()) {
+			if (!getInstance().executeQuery(queue.poll()))
 				break;
 		}
 	}
@@ -181,6 +186,100 @@ public class Database {
 		return "'" + content + "'";
 	}
 
+	public static List<String> getRouteIdsFromFilter(Filter filter) {
+
+		final int expense = filter.getExpense();
+		final String city_name = filter.getCity_name();
+		final int duration = filter.getDuration();
+		final int score = (int) filter.getScore();
+		final int path_type = filter.getPath_type();
+
+		HashSet<String> routeIds = new HashSet<String>(getRouteIdsFromCity(city_name));
+		routeIds.retainAll(getRouteIdsFromCostAndDuration(expense, duration));
+		routeIds.retainAll(getRouteIdsFromLike(score));
+		routeIds.retainAll(getRouteIdsFromTransportation(path_type));
+		return new ArrayList<String>(routeIds);
+	}
+
+	private static List<String> getRouteIdsFromTransportation(final int transportation) {
+		final List<String> list = new ArrayList<String>();
+		getInstance().execute(new SelectionQuery() {
+			public String getQuery() {
+				return "SELECT route_id" +
+						"FROM DB_ENTRY " +
+						"INNER JOIN DB_ROUTE ON DB_ENTRY.route_id = DB_ROUTE.route_id" +
+						"INNER JOIN DB_PATH ON DB_ENTRY.path_id = DB_PATH.path_id" +
+						"WHERE DB_PATH.path_type = " + transportation;
+			}
+
+			public boolean onResult(QueryResult result) throws SQLException {
+				while (result.getResultSet().next()) {
+					list.add(result.getResultSet().getString("route_id"));
+				}
+				return false;
+			}
+		});
+		return list;
+	}
+
+	private static List<String> getRouteIdsFromLike(final int minRate) {
+		final List<String> list = new ArrayList<String>();
+		getInstance().execute(new SelectionQuery() {
+			public String getQuery() {
+				return "SELECT route_id" +
+						"FROM DB_ROUTE_LIKE " +
+						"INNER JOIN DB_ROUTE ON DB_ROUTE.route_id = DB_ROUTE_LIKE.route_id" +
+						"INNER JOIN DB_LIKE ON DB_ROUTE_LIKE.like_id = DB_LIKE.like_id" +
+						"WHERE DB_LIKE.score >= " + minRate;
+			}
+
+			public boolean onResult(QueryResult result) throws SQLException {
+				while (result.getResultSet().next()) {
+					list.add(result.getResultSet().getString("route_id"));
+				}
+				return false;
+			}
+		});
+		return list;
+	}
+
+	private static List<String> getRouteIdsFromCostAndDuration(final int averageCost, final int duration) {
+		final List<String> list = new ArrayList<String>();
+		getInstance().execute(new SelectionQuery() {
+			public String getQuery() {
+				return "SELECT route_id,SUM(expense) AS totalExpense, SUM(duration) AS totalDuration " +
+						"FROM DB_ROUTE INNER JOIN DB_ENTRY ON DB_ROUTE.route_id = DB_ENTRY.route_id" +
+						"HAVING totalExpense <= " + averageCost + "AND totalDuration <= " + duration;
+			}
+
+			public boolean onResult(QueryResult result) throws SQLException {
+				while (result.getResultSet().next()) {
+					list.add(result.getResultSet().getString("route_id"));
+				}
+				return false;
+			}
+		});
+		return list;
+	}
+
+	private static List<String> getRouteIdsFromCity(final String city) {
+		final List<String> list = new ArrayList<String>();
+		getInstance().execute(new SelectionQuery() {
+			public String getQuery() {
+				String cityQuery = "SELECT city_id FROM DB_CITY WHERE " + "city_name" + "=" + city.toUpperCase();
+				return "SELECT route_id FROM DB_ROUTE WHERE " + "(" + cityQuery + ") AND privacy = 0";
+			}
+			public boolean onResult(QueryResult result) throws SQLException {
+
+				while (result.getResultSet().next()) {
+					list.add(result.getResultSet().getString("route_id"));
+				}
+				return false;
+			}
+		});
+		return list;
+	}
+
 	public static Route getRouteInfo(String route_id) throws IOException, ClassNotFoundException {
 
 		final AtomicInteger pathsLength = new AtomicInteger(0);
@@ -189,11 +288,11 @@ public class Database {
 		final AtomicReference<String> id = new AtomicReference<String>();
 		final AtomicReference<String> creator = new AtomicReference<String>();
 		final AtomicReference<String> city_id = new AtomicReference<String>();
-		final AtomicReference<String> title = new AtomicReference<String>();
 		final AtomicReferenceArray<IEntry> stops  = new AtomicReferenceArray<IEntry>(50);
+		final AtomicReference<String> title = new AtomicReference<String>();
 		final AtomicReferenceArray<IEntry> paths  = new AtomicReferenceArray<IEntry>(50);
-		final AtomicReferenceArray<IEntry> entries = new AtomicReferenceArray<IEntry>(100);
 		final AtomicInteger privacy = new AtomicInteger();
+		final AtomicReferenceArray<IEntry> entries = new AtomicReferenceArray<IEntry>(100);
 
 		id.set(route_id);
 
@@ -202,8 +301,8 @@ public class Database {
 			protected void PrepareQueue(Queue<ISingleQuery> queue) {
 
 				queue.add(new SelectionQuery() {
-					public String getQuery() {
 
+					public String getQuery() {
 						String routeIdQuery = "SELECT * FROM DB_ROUTE WHERE ROUTE_ID = " + id.get();
 						return routeIdQuery;
 					}
@@ -213,8 +312,8 @@ public class Database {
 						ResultSet rs = result.getResultSet();
 
 						creator.set(rs.getString(ROUTE_CREATOR));
-						city_id.set(rs.getString(CITY_CITY_ID));
 						title.set(rs.getString(ROUTE_TITLE));
+						city_id.set(rs.getString(CITY_CITY_ID));
 						privacy.set(rs.getInt(ROUTE_PRIVACY));
 
 						return true;
@@ -231,8 +330,8 @@ public class Database {
 
 					public boolean onResult(QueryResult result) throws SQLException {
 						ResultSet rs = result.getResultSet();
-
 						Stop tmpStop;
+
 
 						while(rs.next()){
 							tmpStop = new Stop();

@@ -5,7 +5,6 @@ import com.squadro.touricity.database.result.QueryResult;
 
 import java.io.IOException;
 import java.sql.SQLException;
-
 public interface ISingleQuery{
 
 	void execute();
