@@ -3,12 +3,10 @@ package com.squadro.touricity.database;
 import com.squadro.touricity.database.query.ISingleQuery;
 import com.squadro.touricity.database.query.SelectionQuery;
 import com.squadro.touricity.database.query.pipeline.IPipelinedQuery;
-import com.squadro.touricity.database.query.ISingleQuery;
 import com.squadro.touricity.database.query.pipeline.PipelinedQuery;
 import com.squadro.touricity.database.result.QueryResult;
 import com.squadro.touricity.message.types.data.*;
 import com.squadro.touricity.message.types.data.enumeration.PathType;
-import com.squadro.touricity.session.RequestInterceptor;
 import com.squadro.touricity.message.types.data.Filter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -279,7 +277,7 @@ public class Database {
 		return list;
 	}
 
-	public static Route getRouteInfo(String route_id) throws IOException, ClassNotFoundException {
+	public static Route getRouteInfo(String route_id) {
 
 		final AtomicInteger pathsLength = new AtomicInteger(0);
 		final AtomicInteger stopsLength = new AtomicInteger(0);
@@ -320,7 +318,6 @@ public class Database {
 				});
 
 				//stops ->
-
 				queue.add(new SelectionQuery() {
 					public String getQuery() {
 						String stopQuery = "SELECT EXPENSE,DURATION,COMMENT_DESC,STOP_ID,POINTER FROM ENTRY WHERE ROUTE_ID = " + id.get() + "AND STOP_ID IS NOT NULL ORDER BY POINTER ASC";
@@ -331,7 +328,6 @@ public class Database {
 						ResultSet rs = result.getResultSet();
 						Stop tmpStop;
 
-
 						while(rs.next()){
 							tmpStop = new Stop();
 							tmpStop.setStop_id(rs.getString(STOP_STOP_ID));
@@ -340,12 +336,10 @@ public class Database {
 							tmpStop.setComment(rs.getString(ENTRY_COMMENT_DESCRIPTION));
 							tmpStop.setIndex(rs.getInt("POINTER"));
 
-
 							stops.set(stopsLength.get() , tmpStop);
 							stopsLength.set(stopsLength.get() + 1);
 							tmpStop = null;
 						}
-
 						return true;
 					}
 				});
@@ -358,20 +352,15 @@ public class Database {
 							String stop_locationIdQuery = "SELECT LOCATION_ID FROM DB_STOP WHERE STOP_ID = " + ((Stop) stops.get(stopCounter.get())).getStop_id();
 							return stop_locationIdQuery;
 						}
-
 						public boolean onResult(QueryResult result) throws SQLException {
-
 							ResultSet rs = result.getResultSet();
 							((Stop)(stops.get(stopCounter.get()))).setLocation_id(rs.getString(STOP_LOCATION_ID));
 							return true;
 						}
 					});
-
 					stopCounter.set(stopCounter.get()+1);
 				}
-
 				//////paths ->
-
 				queue.add(new SelectionQuery() {
 					public String getQuery() {
 						String pathQuery = "SELECT EXPENSE,DURATION,COMMENT_DESC,PATH_ID,POINTER FROM ENTRY WHERE ROUTE_ID = " + id.get() + "AND PATH_ID IS NOT NULL ORDER BY POINTER ASC";
@@ -394,7 +383,6 @@ public class Database {
 							paths.set(pathsLength.get() , tmpPath);
 							tmpPath = null;
 						}
-
 						return true;
 					}
 				});
@@ -407,8 +395,7 @@ public class Database {
 							String pathType_VerticesQuery = "SELECT PATH_TYPE, VERTICES FROM DB_PATH WHERE PATH_ID = " + ((Path) paths.get(pathCounter.get())).getPath_id();
 							return pathType_VerticesQuery;
 						}
-
-						public boolean onResult(QueryResult result) throws SQLException, IOException, ClassNotFoundException {
+						public boolean onResult(QueryResult result) throws SQLException {
 
 							ResultSet rs = result.getResultSet();
 							((Path)(paths.get(pathCounter.get()))).setPath_type(PathType.values()[rs.getInt(PATH_PATH_TYPE)]);
@@ -422,11 +409,9 @@ public class Database {
 		});
 
 		if(stops.get(0).getIndex() == 0){
-
 			for(int i = 0; i < stopsLength.get() + pathsLength.get() ; i++){
 				int j = 0; //counter for stops.
 				int k = 0; //counter for paths.
-
 				if(i % 2 == 0){
 					entries.set(i, stops.get(j));
 					j++;
@@ -453,7 +438,6 @@ public class Database {
 				}
 			}
 		}
-
 		IEntry[] entries2return = new IEntry[entries.length()];
 
 		for(int i = 0; i < stopsLength.get() + pathsLength.get() ; i++){
@@ -461,14 +445,21 @@ public class Database {
 		}
 
 		Route route = new Route(creator.get(), id.get(), entries2return, city_id.get(), title.get(), privacy.get());
-
 		return route;
 	}
 
-	private static IPath.PathVertex[] byteArrayToVerticesArray(byte[] bytes) throws IOException, ClassNotFoundException {
-		ByteArrayInputStream in = new ByteArrayInputStream(bytes);
-		ObjectInputStream is = new ObjectInputStream(in);
-		return (IPath.PathVertex[]) is.readObject();
+	private static IPath.PathVertex[] byteArrayToVerticesArray(byte[] bytes) {
+		ByteArrayInputStream in;
+		ObjectInputStream is = null;
+		IPath.PathVertex[] arr = null;
+		try{
+			in = new ByteArrayInputStream(bytes);
+			is = new ObjectInputStream(in);
+			arr = (IPath.PathVertex[]) is.readObject();
+		}catch (Exception e){
+			e.getStackTrace();
+		}
+		return arr;
 	}
 	
 }
