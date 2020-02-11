@@ -6,12 +6,15 @@ import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromCi
 import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromCostAndDuration;
 import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromLike;
 import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromTransportation;
+import com.squadro.touricity.database.query.locationQueries.InsertNewLocationQuery;
 import com.squadro.touricity.database.query.pipeline.IPipelinedQuery;
 import com.squadro.touricity.database.query.pipeline.PipelinedQuery;
 import com.squadro.touricity.database.result.QueryResult;
 import com.squadro.touricity.message.types.IMessage;
+import com.squadro.touricity.message.types.Status;
 import com.squadro.touricity.message.types.data.*;
 import com.squadro.touricity.message.types.data.enumeration.PathType;
+import com.squadro.touricity.message.types.data.enumeration.StatusCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -209,10 +212,21 @@ public class Database {
 
 		List<Route> routeList = new ArrayList<>();
 		Iterator<String> iterator = routeIds.iterator();
-		while(iterator.hasNext()){
+		while (iterator.hasNext()) {
 			routeList.add(getRouteInfo(iterator.next()));
 		}
 		return new FilterResult(routeList);
+	}
+
+	public static IMessage createLocation(Location location) {
+		InsertNewLocationQuery newLocationQuery = new InsertNewLocationQuery(location.getLocation_id(),
+				location.getLongitude(), location.getLatitude());
+		newLocationQuery.execute();
+		if(newLocationQuery.isSuccessfull()){
+			return Status.build(StatusCode.INSERT_LOCATION_SUCCESSFULL);
+		}else{
+			return Status.build(StatusCode.INSERT_LOCATION_FAIL);
+		}
 	}
 
 	public static Route getRouteInfo(String route_id) {
