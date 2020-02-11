@@ -11,7 +11,9 @@ public enum StatusCode {
     SIGNUP_REJECT_USERNAME(104, "Username allready exists!"),
     SIGNUP_REJECT_PASSWORD(105, "Password should be in the format!"),
     SIGNOUT_SUCCESSFULL(106, "User successfully signed out!"),
-    REJECT_COOKIE_NOTSET(107, "Cookie could not be set!");
+    REJECT_COOKIE_NOTSET(107, "Cookie could not be set!"),
+    INSERT_LOCATION_SUCCESSFULL(108,"New location successfully inserted!"),
+    INSERT_LOCATION_FAIL(109,"New location insertion failed!");
 
     StatusCode(int status, String message) {
         this.status = status;
