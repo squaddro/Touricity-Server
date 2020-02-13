@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class InsertNewEntryQuery extends InsertionQuery {
 
     private final String route_id;
-    private final AtomicReference<IEntry> entry = null;
+    private final AtomicReference<IEntry> entry = new AtomicReference<>();
     private boolean isStop;
 
     public InsertNewEntryQuery(String route_id, IEntry entry) {
@@ -93,5 +93,8 @@ public class InsertNewEntryQuery extends InsertionQuery {
             e.getStackTrace();
             return null;
         }
+    }
+    public IEntry getEntry(){
+        return entry.get();
     }
 }

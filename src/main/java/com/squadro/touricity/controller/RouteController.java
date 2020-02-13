@@ -24,4 +24,20 @@ public class RouteController {
         return route;
     }
 
+    @RequestMapping(
+            value = "route/update",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    @ResponseBody
+    public Route updateRoute(
+            @RequestBody Route route,
+            @CookieValue(value = "cookie_uuid", defaultValue = "notset") String cookie
+    ){
+        Route newRoute = null;
+        newRoute = Database.insertRoute(route);
+        return newRoute;
+    }
+
 }

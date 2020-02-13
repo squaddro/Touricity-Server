@@ -230,6 +230,15 @@ public class Database {
 		}
 	}
 
+	public static Route insertRoute(Route route) {
+		final AtomicReference<Route> finalRoute = new AtomicReference<>();
+
+		InsertNewRouteQuery insertNewRouteQuery = new InsertNewRouteQuery(route.getRoute_id(), route.getCreator(), route.getEntries(), route.getCity_id(), route.getTitle(), route.getPrivacy());
+		insertNewRouteQuery.execute();
+
+		return insertNewRouteQuery.getRoute();
+	}
+
 	public static Route getRouteInfo(String route_id){
 
 		final AtomicReference<String> id = new AtomicReference<>(route_id);

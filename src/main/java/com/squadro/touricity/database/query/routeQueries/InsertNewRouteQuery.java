@@ -3,10 +3,9 @@ package com.squadro.touricity.database.query.routeQueries;
 import com.squadro.touricity.database.query.InsertionQuery;
 import com.squadro.touricity.database.result.QueryResult;
 import com.squadro.touricity.message.types.data.IEntry;
+import com.squadro.touricity.message.types.data.Route;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.UUID;
 
 public class InsertNewRouteQuery extends InsertionQuery{
 
@@ -38,7 +37,12 @@ public class InsertNewRouteQuery extends InsertionQuery{
         for(int i = 0; i < entries.length; i++) {
             InsertNewEntryQuery insertNewEntryQuery = new InsertNewEntryQuery(route_id, entries[i]);
             insertNewEntryQuery.execute();
+            entries[i] = insertNewEntryQuery.getEntry();
         }
         return false;
+    }
+
+    public Route getRoute(){
+        return new Route(creator, route_id, entries, cityId, title, privacy);
     }
 }
