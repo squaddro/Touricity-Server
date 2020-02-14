@@ -230,6 +230,52 @@ public class Database {
 		}
 	}
 
+	public static IMessage deleteRoute(String routeId) {
+		DeleteRouteQuery deletingRouteQuery = new DeleteRouteQuery(routeId);
+		deletingRouteQuery.execute();
+		if(deletingRouteQuery.isSuccessfull()) {
+			return Status.build(StatusCode.DELETE_ROUTE_SUCCESSFULL);
+		}
+		else
+			return Status.build(StatusCode.DELETE_ROUTE_FAIL);
+	}
+
+	public static Location getLocationInfo(String location_id){
+		final AtomicReference<String> id = new AtomicReference<>();
+		final AtomicReference<String> city_id = new AtomicReference<>();
+		final AtomicReference<Double> latitude = new AtomicReference<>();
+		final AtomicReference<Double> longitude = new AtomicReference<>();
+
+		id.set(location_id);
+		getInstance().execute(new PipelinedQuery() {
+
+			protected void PrepareQueue(Queue<ISingleQuery> queue) {
+
+				queue.add(new SelectionQuery() {
+
+					public String getQuery() {
+						String locationIdQuery = "SELECT * FROM DB_LOCATION WHERE LOCATION_ID = " + id.get();
+						return locationIdQuery;
+					}
+
+					public boolean onResult(QueryResult result) throws SQLException {
+
+						ResultSet rs = result.getResultSet();
+
+						city_id.set(rs.getString(LOCATION_CITY_ID));
+						latitude.set(rs.getDouble(LOCATION_LATITUDE));
+						longitude.set(rs.getDouble(LOCATION_LONGITUDE));
+
+						return true;
+					}
+				});
+			}
+		});
+
+		Location location = new Location(id.get(), city_id.get(), latitude.get(), longitude.get());
+		return location;
+	}
+
 	public static Route insertRoute(Route route) {
 		final AtomicReference<Route> finalRoute = new AtomicReference<>();
 

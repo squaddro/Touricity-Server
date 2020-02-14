@@ -13,7 +13,9 @@ public enum StatusCode {
     SIGNOUT_SUCCESSFULL(106, "User successfully signed out!"),
     REJECT_COOKIE_NOTSET(107, "Cookie could not be set!"),
     INSERT_LOCATION_SUCCESSFULL(108,"New location successfully inserted!"),
-    INSERT_LOCATION_FAIL(109,"New location insertion failed!");
+    INSERT_LOCATION_FAIL(109,"New location insertion failed!"),
+    DELETE_ROUTE_SUCCESSFULL(110,"Route is successfully deleted!"),
+    DELETE_ROUTE_FAIL(111,"Deleting route failed!");
 
     StatusCode(int status, String message) {
         this.status = status;
