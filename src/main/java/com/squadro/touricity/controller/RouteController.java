@@ -31,12 +31,14 @@ public class RouteController {
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
+    )
     @ResponseBody
     public IMessage deleteRoute(
             @RequestBody String route_id,
             @CookieValue(value = "cookie_uuid", defaultValue = "notset") String cookie
     ){
         return Database.deleteRoute(route_id);
+    }
 
     @RequestMapping(
             value = "route/update",
