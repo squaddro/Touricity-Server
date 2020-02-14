@@ -22,4 +22,18 @@ public class LocationController {
 	) {
 		return Database.createLocation(location);
 	}
+	@RequestMapping(
+			value = "/location/info",
+			method = RequestMethod.POST,
+			produces = MediaType.APPLICATION_JSON_VALUE,
+			consumes = MediaType.APPLICATION_JSON_VALUE
+	)
+	@ResponseBody
+	public IMessage getLocationInfo(
+			@RequestBody String location_id,
+			@CookieValue(value = "cookie_uuid", defaultValue = "notset") String cookie
+	) {
+		return Database.getLocationInfo(location_id);
+	}
 }
+

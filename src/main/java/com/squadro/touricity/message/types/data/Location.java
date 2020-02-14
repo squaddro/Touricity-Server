@@ -18,6 +18,13 @@ public class Location implements ILocation {
 		this.latitude = latitude;
 		this.longitude = longitude;
 	}
+
+	public Location(String locationId, String cityId, double latitude, double longitude){
+		this.location_id = locationId;
+		this.cityId = cityId;
+		this.latitude = latitude;
+		this.longitude = longitude;
+	}
 	
 	public String getLocation_id() {
 		return location_id;
