@@ -9,7 +9,7 @@ import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromTr
 import com.squadro.touricity.database.query.locationQueries.InsertNewLocationQuery;
 import com.squadro.touricity.database.query.pipeline.IPipelinedQuery;
 import com.squadro.touricity.database.query.pipeline.PipelinedQuery;
-import com.squadro.touricity.database.query.routeQueries.DeleteRouteQuery;
+import com.squadro.touricity.database.query.routeQueries.*;
 import com.squadro.touricity.database.result.QueryResult;
 import com.squadro.touricity.message.types.IMessage;
 import com.squadro.touricity.message.types.Status;
@@ -276,188 +276,105 @@ public class Database {
 		return location;
 	}
 
-	public static Route getRouteInfo(String route_id) {
+	public static Route insertRoute(Route route) {
+		final AtomicReference<Route> finalRoute = new AtomicReference<>();
 
-		final AtomicInteger pathsLength = new AtomicInteger(0);
-		final AtomicInteger stopsLength = new AtomicInteger(0);
+		InsertNewRouteQuery insertNewRouteQuery = new InsertNewRouteQuery(route.getRoute_id(), route.getCreator(), route.getEntries(), route.getCity_id(), route.getTitle(), route.getPrivacy());
+		insertNewRouteQuery.execute();
 
-		final AtomicReference<String> id = new AtomicReference<String>();
+		return insertNewRouteQuery.getRoute();
+	}
+
+	public static Route getRouteInfo(String route_id){
+
+		final AtomicReference<String> id = new AtomicReference<>(route_id);
 		final AtomicReference<String> creator = new AtomicReference<String>();
 		final AtomicReference<String> city_id = new AtomicReference<String>();
-		final AtomicReferenceArray<IEntry> stops = new AtomicReferenceArray<IEntry>(50);
+		final List<IEntry> stops = Collections.synchronizedList(new ArrayList<>());
+		final List<IEntry> paths = Collections.synchronizedList(new ArrayList<>());
+		List<IEntry> entries = new ArrayList<>();
 		final AtomicReference<String> title = new AtomicReference<String>();
-		final AtomicReferenceArray<IEntry> paths = new AtomicReferenceArray<IEntry>(50);
 		final AtomicInteger privacy = new AtomicInteger();
-		final AtomicReferenceArray<IEntry> entries = new AtomicReferenceArray<IEntry>(100);
 
-		id.set(route_id);
+		CreatorSelectionFromRouteId creatorSelectionFromRouteId = new CreatorSelectionFromRouteId(route_id);
+		TitleSelectionFromRouteId titleSelectionFromRouteId = new TitleSelectionFromRouteId(route_id);
+		CityIdSelectionFromRouteId cityIdSelectionFromRouteId = new CityIdSelectionFromRouteId(route_id);
+		PrivacySelectionFromRouteId privacySelectionFromRouteId = new PrivacySelectionFromRouteId(route_id);
+		StopListSelectionFromRouteId stopListSelectionFromRouteId = new StopListSelectionFromRouteId(route_id);
+		PathListSelectionFromRouteId pathListSelectionFromRouteId = new PathListSelectionFromRouteId(route_id);
 
-		getInstance().execute(new PipelinedQuery() {
+		creatorSelectionFromRouteId.execute();
+		titleSelectionFromRouteId.execute();
+		cityIdSelectionFromRouteId.execute();
+		privacySelectionFromRouteId.execute();
+		stopListSelectionFromRouteId.execute();
+		pathListSelectionFromRouteId.execute();
 
-			protected void PrepareQueue(Queue<ISingleQuery> queue) {
+		creator.set(creatorSelectionFromRouteId.getCreator());
+		title.set(titleSelectionFromRouteId.getTitle());
+		city_id.set(cityIdSelectionFromRouteId.getCityId());
+		privacy.set(privacySelectionFromRouteId.getPrivacy());
+		stops.addAll(stopListSelectionFromRouteId.getList());
+		paths.addAll(pathListSelectionFromRouteId.getList());
 
-				queue.add(new SelectionQuery() {
 
-					public String getQuery() {
-						String routeIdQuery = "SELECT * FROM DB_ROUTE WHERE ROUTE_ID = " + id.get();
-						return routeIdQuery;
-					}
+		for(int i = 0 ; i<stops.size() ; i++) {
+			String stop_id = ((Stop)stops.get(i)).getStop_id();
+			LocationIdSelectionFromStopId locationIdSelectionFromStopId = new LocationIdSelectionFromStopId(stop_id);
+			locationIdSelectionFromStopId.execute();
+			((Stop)stops.get(i)).setLocation_id(locationIdSelectionFromStopId.getLocationId());
+		}
 
-					public boolean onResult(QueryResult result) throws SQLException {
+		for(int i = 0 ; i < paths.size() ; i++) {
+			String pathId = ((Path)paths.get(i)).getPath_id();
 
-						ResultSet rs = result.getResultSet();
+			PathTypeSelectionFromPathId pathTypeSelectionFromPathId = new PathTypeSelectionFromPathId(pathId);
+			VerticesSelectionFromPathId verticesSelectionFromPathId = new VerticesSelectionFromPathId(pathId);
 
-						creator.set(rs.getString(ROUTE_CREATOR));
-						title.set(rs.getString(ROUTE_TITLE));
-						city_id.set(rs.getString(CITY_CITY_ID));
-						privacy.set(rs.getInt(ROUTE_PRIVACY));
+			pathTypeSelectionFromPathId.execute();
+			verticesSelectionFromPathId.execute();
 
-						return true;
-					}
-				});
+			((Path) paths.get(i)).setPath_type(PathType.values()[pathTypeSelectionFromPathId.getPathType()]);
+			((Path) (paths.get(i))).setVertices(verticesSelectionFromPathId.getVertices());
+		}
 
-				//stops ->
-				queue.add(new SelectionQuery() {
-					public String getQuery() {
-						String stopQuery = "SELECT EXPENSE,DURATION,COMMENT_DESC,STOP_ID,POINTER FROM ENTRY WHERE ROUTE_ID = " + id.get() + "AND STOP_ID IS NOT NULL ORDER BY POINTER ASC";
-						return stopQuery;
-					}
+		entries = combineSortedStopsAndPaths(stops, paths);
 
-					public boolean onResult(QueryResult result) throws SQLException {
-						ResultSet rs = result.getResultSet();
-						Stop tmpStop;
+		return new Route(creator.get(), id.get(), (IEntry[]) entries.toArray(), city_id.get(), title.get(), privacy.get());
+	}
 
-						while (rs.next()) {
-							tmpStop = new Stop();
-							tmpStop.setStop_id(rs.getString(STOP_STOP_ID));
-							tmpStop.setExpense(rs.getInt(ENTRY_EXPENSE));
-							tmpStop.setDuration(rs.getInt(ENTRY_DURATION));
-							tmpStop.setComment(rs.getString(ENTRY_COMMENT_DESCRIPTION));
-							tmpStop.setIndex(rs.getInt("POINTER"));
+	private static List<IEntry> combineSortedStopsAndPaths(List<IEntry> stops, List<IEntry> paths) {
+		List<IEntry> entries = new ArrayList<>();
 
-							stops.set(stopsLength.get(), tmpStop);
-							stopsLength.set(stopsLength.get() + 1);
-							tmpStop = null;
-						}
-						return true;
-					}
-				});
-
-				final AtomicInteger stopCounter = new AtomicInteger(0);
-				while (stopCounter.get() < stopsLength.get()) {
-
-					queue.add(new SelectionQuery() {
-						public String getQuery() {
-							String stop_locationIdQuery = "SELECT LOCATION_ID FROM DB_STOP WHERE STOP_ID = " + ((Stop) stops.get(stopCounter.get())).getStop_id();
-							return stop_locationIdQuery;
-						}
-
-						public boolean onResult(QueryResult result) throws SQLException {
-							ResultSet rs = result.getResultSet();
-							((Stop) (stops.get(stopCounter.get()))).setLocation_id(rs.getString(STOP_LOCATION_ID));
-							return true;
-						}
-					});
-					stopCounter.set(stopCounter.get() + 1);
-				}
-				//////paths ->
-				queue.add(new SelectionQuery() {
-					public String getQuery() {
-						String pathQuery = "SELECT EXPENSE,DURATION,COMMENT_DESC,PATH_ID,POINTER FROM ENTRY WHERE ROUTE_ID = " + id.get() + "AND PATH_ID IS NOT NULL ORDER BY POINTER ASC";
-						return pathQuery;
-					}
-
-					public boolean onResult(QueryResult result) throws SQLException {
-						ResultSet rs = result.getResultSet();
-
-						Path tmpPath;
-
-						while (rs.next()) {
-							tmpPath = new Path();
-							tmpPath.setPath_id(rs.getString(PATH_PATH_ID));
-							tmpPath.setExpense(rs.getInt(ENTRY_EXPENSE));
-							tmpPath.setDuration(rs.getInt(ENTRY_DURATION));
-							tmpPath.setComment(rs.getString(ENTRY_COMMENT_DESCRIPTION));
-							tmpPath.setIndex(rs.getInt("POINTER"));
-
-							paths.set(pathsLength.get(), tmpPath);
-							tmpPath = null;
-						}
-						return true;
-					}
-				});
-
-				final AtomicInteger pathCounter = new AtomicInteger(0);
-				while (pathCounter.get() < pathsLength.get()) {
-
-					queue.add(new SelectionQuery() {
-						public String getQuery() {
-							String pathType_VerticesQuery = "SELECT PATH_TYPE, VERTICES FROM DB_PATH WHERE PATH_ID = " + ((Path) paths.get(pathCounter.get())).getPath_id();
-							return pathType_VerticesQuery;
-						}
-
-						public boolean onResult(QueryResult result) throws SQLException {
-
-							ResultSet rs = result.getResultSet();
-							((Path) (paths.get(pathCounter.get()))).setPath_type(PathType.values()[rs.getInt(PATH_PATH_TYPE)]);
-							((Path) (paths.get(pathCounter.get()))).setVertices(byteArrayToVerticesArray(rs.getBytes(PATH_VERTICES)));
-							return true;
-						}
-					});
-					pathCounter.set(pathCounter.get() + 1);
-				}
-			}
-		});
-
-		if (stops.get(0).getIndex() == 0) {
-			for (int i = 0; i < stopsLength.get() + pathsLength.get(); i++) {
+		if(stops.size() > 0 && stops.get(0).getIndex() == 0){
+			for(int i=0; i < stops.size() + paths.size() ; i++){
 				int j = 0; //counter for stops.
 				int k = 0; //counter for paths.
 				if (i % 2 == 0) {
-					entries.set(i, stops.get(j));
+					entries.add(stops.get(j));
 					j++;
 				} else {
-					entries.set(i, paths.get(k));
+					entries.add(paths.get(k));
 					k++;
 				}
 			}
-		} else if (paths.get(0).getIndex() == 0) {
-
-			for (int i = 0; i < stopsLength.get() + pathsLength.get(); i++) {
+		}
+		else if (paths.size() > 0 && paths.get(0).getIndex() == 0) {
+			for (int i = 0; i < stops.size() + paths.size() ; i++) {
 				int j = 0; //counter for paths.
 				int k = 0; //counter for stops.
-
 				if (i % 2 == 0) {
-					entries.set(i, paths.get(j));
+					entries.add(paths.get(j));
 					j++;
 				} else {
-					entries.set(i, stops.get(k));
+					entries.add(stops.get(k));
 					k++;
 				}
 			}
 		}
-		IEntry[] entries2return = new IEntry[entries.length()];
+		else
+			entries = null;
 
-		for (int i = 0; i < stopsLength.get() + pathsLength.get(); i++) {
-			entries2return[i] = entries.get(i);
-		}
-
-		Route route = new Route(creator.get(), id.get(), entries2return, city_id.get(), title.get(), privacy.get());
-		return route;
+		return entries;
 	}
-
-	private static IPath.PathVertex[] byteArrayToVerticesArray(byte[] bytes) {
-		ByteArrayInputStream in;
-		ObjectInputStream is = null;
-		IPath.PathVertex[] arr = null;
-		try {
-			in = new ByteArrayInputStream(bytes);
-			is = new ObjectInputStream(in);
-			arr = (IPath.PathVertex[]) is.readObject();
-		} catch (Exception e) {
-			e.getStackTrace();
-		}
-		return arr;
-	}
-
 }

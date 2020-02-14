@@ -21,6 +21,16 @@ public class Path extends Entry implements IPath {
 		this.expense = expense;
 		this.comment = comment;
 	}
+
+	public Path(String path_id, PathType path_type, PathVertex[] vertices, int duration, int expense, String comment, int index){
+		this.path_id = path_id;
+		this.path_type = path_type;
+		this.vertices = vertices;
+		this.duration = duration;
+		this.expense = expense;
+		this.comment = comment;
+		this.index = index;
+	}
 	
 	public String getPath_id() {
 		return path_id;
