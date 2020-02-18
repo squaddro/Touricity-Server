@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class StopController {
+public class MockStopController {
 
     @RequestMapping(value = "/mock/stop", produces = MediaType.APPLICATION_JSON_VALUE)
     public IMessage stop(@RequestParam(value="random", defaultValue="false") String random) {
@@ -24,11 +24,11 @@ public class StopController {
             duration = 360;
             comment = "Very nice place!";
         } else if (random.equals("true")) {
-            stopId = RandomGenerator.randomAlphaNumericGenerator(36);
-            locationId = RandomGenerator.randomAlphaNumericGenerator(36);
-            expense = RandomGenerator.randomIntGenerator(5);
-            duration = RandomGenerator.randomIntGenerator(360);
-            comment = RandomGenerator.randomAlphaNumericGenerator(1000);
+            stopId = MockRandomGenerator.randomAlphaNumericGenerator(36);
+            locationId = MockRandomGenerator.randomAlphaNumericGenerator(36);
+            expense = MockRandomGenerator.randomIntGenerator(5);
+            duration = MockRandomGenerator.randomIntGenerator(360);
+            comment = MockRandomGenerator.randomAlphaNumericGenerator(1000);
         }
         return new Stop(locationId, stopId, expense, duration, comment);
     }

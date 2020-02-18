@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 @RestController
-public class StatusController {
+public class MockStatusController {
 
     private class StatusArray implements IMessage {
         private Collection<Status> statusList;
