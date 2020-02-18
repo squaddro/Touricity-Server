@@ -60,12 +60,13 @@ public class RequestInterceptor extends HandlerInterceptorAdapter {
     }
 
     private SessionCookie extractCookie(Cookie[] cookies) {
-        for(Cookie cookie : cookies) {
-            SessionCookie sc = SessionCookie.from(cookie);
-            if(sc != null)
-                return sc;
+        if(cookies != null){
+            for(Cookie cookie : cookies) {
+                SessionCookie sc = SessionCookie.from(cookie);
+                if(sc != null)
+                    return sc;
+            }
         }
-
         return null;
     }
 }
