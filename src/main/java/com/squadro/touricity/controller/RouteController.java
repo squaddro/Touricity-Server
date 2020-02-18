@@ -41,7 +41,7 @@ public class RouteController {
     }
 
     @RequestMapping(
-            value = "route/update",
+            value = "/route/update",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
