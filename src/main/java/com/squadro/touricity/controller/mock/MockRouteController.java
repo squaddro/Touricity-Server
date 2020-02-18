@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class RouteController {
+public class MockRouteController {
 
     @RequestMapping(value = "/mock/route", produces = MediaType.APPLICATION_JSON_VALUE)
     public IMessage route(@RequestParam(value="random", defaultValue="false") String random) {
@@ -39,19 +39,19 @@ public class RouteController {
             path2 = new Path("e37de228-de53-c3a5-edb7-427634d87ea8" , PathType.values()[2], vertices2, 330, 1, "Very nice place!");
             entries = new IEntry[]{stop1,path1,stop2,path2,stop3};
         } else if (random.equals("true")) {
-            creator = RandomGenerator.randomAlphaNumericGenerator(36);
-            routeId = RandomGenerator.randomAlphaNumericGenerator(36);
-            stop1 = new Stop(RandomGenerator.randomAlphaNumericGenerator(36), RandomGenerator.randomAlphaNumericGenerator(36), RandomGenerator.randomIntGenerator(5), RandomGenerator.randomIntGenerator(360), RandomGenerator.randomAlphaNumericGenerator(1000));
-            stop2 = new Stop(RandomGenerator.randomAlphaNumericGenerator(36), RandomGenerator.randomAlphaNumericGenerator(36), RandomGenerator.randomIntGenerator(5), RandomGenerator.randomIntGenerator(360), RandomGenerator.randomAlphaNumericGenerator(1000));
-            stop3 = new Stop(RandomGenerator.randomAlphaNumericGenerator(36), RandomGenerator.randomAlphaNumericGenerator(36), RandomGenerator.randomIntGenerator(5), RandomGenerator.randomIntGenerator(360), RandomGenerator.randomAlphaNumericGenerator(1000));
-            v1 = new Path.PathVertex(RandomGenerator.randomDoubleGenerator(35,40),RandomGenerator.randomDoubleGenerator(30,35));
-            v2 = new Path.PathVertex(RandomGenerator.randomDoubleGenerator(35,40),RandomGenerator.randomDoubleGenerator(30,35));
-            v3 = new Path.PathVertex(RandomGenerator.randomDoubleGenerator(35,40),RandomGenerator.randomDoubleGenerator(30,35));
-            v4 = new Path.PathVertex(RandomGenerator.randomDoubleGenerator(35,40),RandomGenerator.randomDoubleGenerator(30,35));
+            creator = MockRandomGenerator.randomAlphaNumericGenerator(36);
+            routeId = MockRandomGenerator.randomAlphaNumericGenerator(36);
+            stop1 = new Stop(MockRandomGenerator.randomAlphaNumericGenerator(36), MockRandomGenerator.randomAlphaNumericGenerator(36), MockRandomGenerator.randomIntGenerator(5), MockRandomGenerator.randomIntGenerator(360), MockRandomGenerator.randomAlphaNumericGenerator(1000));
+            stop2 = new Stop(MockRandomGenerator.randomAlphaNumericGenerator(36), MockRandomGenerator.randomAlphaNumericGenerator(36), MockRandomGenerator.randomIntGenerator(5), MockRandomGenerator.randomIntGenerator(360), MockRandomGenerator.randomAlphaNumericGenerator(1000));
+            stop3 = new Stop(MockRandomGenerator.randomAlphaNumericGenerator(36), MockRandomGenerator.randomAlphaNumericGenerator(36), MockRandomGenerator.randomIntGenerator(5), MockRandomGenerator.randomIntGenerator(360), MockRandomGenerator.randomAlphaNumericGenerator(1000));
+            v1 = new Path.PathVertex(MockRandomGenerator.randomDoubleGenerator(35,40), MockRandomGenerator.randomDoubleGenerator(30,35));
+            v2 = new Path.PathVertex(MockRandomGenerator.randomDoubleGenerator(35,40), MockRandomGenerator.randomDoubleGenerator(30,35));
+            v3 = new Path.PathVertex(MockRandomGenerator.randomDoubleGenerator(35,40), MockRandomGenerator.randomDoubleGenerator(30,35));
+            v4 = new Path.PathVertex(MockRandomGenerator.randomDoubleGenerator(35,40), MockRandomGenerator.randomDoubleGenerator(30,35));
             vertices1 = new Path.PathVertex[]{v1,v2};
             vertices2 = new Path.PathVertex[]{v3,v4};
-            path1 = new Path(RandomGenerator.randomAlphaNumericGenerator(36) , PathType.values()[RandomGenerator.randomIntGenerator(3)], vertices1, RandomGenerator.randomIntGenerator(360), RandomGenerator.randomIntGenerator(5), RandomGenerator.randomAlphaNumericGenerator(1000));
-            path2 = new Path(RandomGenerator.randomAlphaNumericGenerator(36) , PathType.values()[RandomGenerator.randomIntGenerator(3)], vertices2, RandomGenerator.randomIntGenerator(360), RandomGenerator.randomIntGenerator(5), RandomGenerator.randomAlphaNumericGenerator(1000));
+            path1 = new Path(MockRandomGenerator.randomAlphaNumericGenerator(36) , PathType.values()[MockRandomGenerator.randomIntGenerator(3)], vertices1, MockRandomGenerator.randomIntGenerator(360), MockRandomGenerator.randomIntGenerator(5), MockRandomGenerator.randomAlphaNumericGenerator(1000));
+            path2 = new Path(MockRandomGenerator.randomAlphaNumericGenerator(36) , PathType.values()[MockRandomGenerator.randomIntGenerator(3)], vertices2, MockRandomGenerator.randomIntGenerator(360), MockRandomGenerator.randomIntGenerator(5), MockRandomGenerator.randomAlphaNumericGenerator(1000));
             entries = new IEntry[]{stop1,path1,stop2,path2,stop3};
         }
         return new Route(creator, routeId, entries);

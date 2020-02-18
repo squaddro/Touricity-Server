@@ -2,7 +2,7 @@ package com.squadro.touricity.controller.mock;
 
 import java.util.Random;
 
-public class RandomGenerator {
+public class MockRandomGenerator {
     private static final String ALPHA_NUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnoprstuvyzxw";
 
     public static int randomIntGenerator(int bound){

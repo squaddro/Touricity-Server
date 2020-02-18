@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class PathController {
+public class MockPathController {
 
     @RequestMapping(value = "/mock/path", produces = MediaType.APPLICATION_JSON_VALUE)
     public IMessage path(@RequestParam(value="random", defaultValue="false") String random) {
@@ -29,15 +29,15 @@ public class PathController {
             Path.PathVertex v2 = new Path.PathVertex(39.938,32.862);
             vertices = new Path.PathVertex[]{v1,v2};
         } else if (random.equals("true")) {
-            pathId  = RandomGenerator.randomAlphaNumericGenerator(36);
-            pathType = RandomGenerator.randomIntGenerator(3);
-            expense = RandomGenerator.randomIntGenerator(5);
-            duration = RandomGenerator.randomIntGenerator(360);
-            comment = RandomGenerator.randomAlphaNumericGenerator(1000);
-            int size = RandomGenerator.randomIntGenerator(6);
+            pathId  = MockRandomGenerator.randomAlphaNumericGenerator(36);
+            pathType = MockRandomGenerator.randomIntGenerator(3);
+            expense = MockRandomGenerator.randomIntGenerator(5);
+            duration = MockRandomGenerator.randomIntGenerator(360);
+            comment = MockRandomGenerator.randomAlphaNumericGenerator(1000);
+            int size = MockRandomGenerator.randomIntGenerator(6);
             vertices = new Path.PathVertex[size];
             for(int i = 0; i<size; i++){
-                Path.PathVertex vertex = new Path.PathVertex(RandomGenerator.randomDoubleGenerator(35,40),RandomGenerator.randomDoubleGenerator(30,35));
+                Path.PathVertex vertex = new Path.PathVertex(MockRandomGenerator.randomDoubleGenerator(35,40), MockRandomGenerator.randomDoubleGenerator(30,35));
                 vertices[i] = vertex;
             }
         }

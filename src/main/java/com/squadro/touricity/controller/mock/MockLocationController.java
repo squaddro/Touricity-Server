@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class LocationController {
+public class MockLocationController {
 
     @RequestMapping(value = "/mock/location", produces = MediaType.APPLICATION_JSON_VALUE)
     public IMessage location(@RequestParam(value="random", defaultValue="false") String random) {
@@ -21,9 +21,9 @@ public class LocationController {
             latitude =  39.936;
             longitude = 32.856;
         } else if (random.equals("true")) {
-            locationId = RandomGenerator.randomAlphaNumericGenerator(36);
-            latitude = RandomGenerator.randomDoubleGenerator(35,40);
-            longitude = RandomGenerator.randomDoubleGenerator(30,35);
+            locationId = MockRandomGenerator.randomAlphaNumericGenerator(36);
+            latitude = MockRandomGenerator.randomDoubleGenerator(35,40);
+            longitude = MockRandomGenerator.randomDoubleGenerator(30,35);
         }
         return new Location(locationId, latitude, longitude);
     }
