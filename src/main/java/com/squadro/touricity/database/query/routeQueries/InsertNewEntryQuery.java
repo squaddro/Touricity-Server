@@ -69,11 +69,11 @@ public class InsertNewEntryQuery extends InsertionQuery {
             Stop stop = (Stop) this.entry.get();
             if(stop.getStop_id() == null){
                 String newUUID = UUID.randomUUID().toString();
-                return "INSERT INTO DB_ENTRY(route_id,stop_id,path_id,entry_id,expense,duration,comment_desc,pointer) VALUES(" +"'"+ route_id + "','" + newUUID + "'," + "NULL" + ",'"
+                return "INSERT INTO db_entry(route_id,stop_id,path_id,entry_id,expense,duration,comment_desc,pointer) VALUES(" +"'"+ route_id + "','" + newUUID + "'," + "NULL" + ",'"
                         + UUID.randomUUID().toString() + "'," + stop.getExpense() + "," + stop.getDuration() + ",'" + stop.getComment() + "'," + stop.getIndex() + ")" + "\n" +
                         "INSERT INTO DB_STOP(location_id, stop_id) VALUES(" + "'" + stop.getLocation_id() + "','" + newUUID + "')";
             }
-            else{ //assumed that given parameter is a stop and already exists in database.
+            else{
                 DoesStopExists doesStopExists = new DoesStopExists(((Stop) entry.get()).getStop_id());
                 doesStopExists.execute();
                 if(doesStopExists.getDoesStopExists()){
