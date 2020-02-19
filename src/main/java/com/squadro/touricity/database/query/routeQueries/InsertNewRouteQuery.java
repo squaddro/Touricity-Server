@@ -6,6 +6,7 @@ import com.squadro.touricity.message.types.data.IEntry;
 import com.squadro.touricity.message.types.data.Route;
 
 import java.sql.SQLException;
+import java.util.UUID;
 
 public class InsertNewRouteQuery extends InsertionQuery{
 
@@ -27,8 +28,21 @@ public class InsertNewRouteQuery extends InsertionQuery{
 
     @Override
     public String getQuery() {
-        String insertionQuery = "INSERT INTO db_route(creator,route_id,city_id,title,route_desc,privacy) VALUES('" + creator + "','" + route_id + "','" + city_id + "','" + title + "'," + "'desccc' ," + privacy + ")";
-        return insertionQuery;
+
+        String query = null;
+        if(route_id == null)
+            query = "INSERT INTO db_route(creator,route_id,city_id,title,route_desc,privacy) VALUES('" + creator + "','" + UUID.randomUUID().toString() + "','" + city_id + "','" + title + "'," + "'desccc' ," + privacy + ")";
+
+        else{
+            DoesRouteExists doesRouteExists = new DoesRouteExists(route_id);
+            doesRouteExists.execute();
+
+            if(doesRouteExists.getDoesRouteExists()){
+                query = "UPDATE db_route SET CREATOR = '" + creator + "', ROUTE_ID = '" + UUID.randomUUID().toString() + "', CITY_ID = '" + city_id + "', TITLE = '" + title + "', ROUTE_DESC = 'dummy desc', PRIVACY =" + privacy;
+            }
+        }
+
+        return query;
     }
 
     @Override
