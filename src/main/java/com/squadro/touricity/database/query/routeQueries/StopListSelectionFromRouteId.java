@@ -23,7 +23,7 @@ public class StopListSelectionFromRouteId extends SelectionQuery {
 
     @Override
     public String getQuery() { //TODO: select Entry_id
-        return "SELECT STOP_ID,EXPENSE,DURATION,COMMENT_DESC,POINTER FROM DB_ENTRY WHERE ROUTE_ID = '" + route_id + "' AND STOP_ID IS NOT NULL ORDER BY POINTER ASC";
+        return "SELECT stop_id,expense,duration,comment_desc,pointer FROM db_entry WHERE route_id = '" + route_id + "' AND stop_id IS NOT NULL ORDER BY pointer ASC";
     }
 
     @Override
@@ -33,11 +33,11 @@ public class StopListSelectionFromRouteId extends SelectionQuery {
 
         while (rs.next()) {
             stop = new Stop();
-            stop.setStop_id(rs.getString("STOP_ID"));
-            stop.setExpense(rs.getInt("EXPENSE"));
-            stop.setDuration(rs.getInt("DURATION"));
-            stop.setComment(rs.getString("COMMENT_DESC"));
-            stop.setIndex(rs.getInt("POINTER"));
+            stop.setStop_id(rs.getString("stop_id"));
+            stop.setExpense(rs.getInt("expense"));
+            stop.setDuration(rs.getInt("duration"));
+            stop.setComment(rs.getString("comment_desc"));
+            stop.setIndex(rs.getInt("pointer"));
 
             list.add(stop);
         }

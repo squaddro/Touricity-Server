@@ -22,7 +22,7 @@ public class PathListSelectionFromRouteId extends SelectionQuery {
 
     @Override
     public String getQuery() { //TODO: select Entry_id
-        return "SELECT PATH_ID,EXPENSE,DURATION,COMMENT_DESC,POINTER FROM DB_ENTRY WHERE ROUTE_ID = '" + route_id + "' AND PATH_ID IS NOT NULL ORDER BY POINTER ASC";
+        return "SELECT path_id,expense,duration,comment_desc,pointer FROM db_entry WHERE route_id = '" + route_id + "' AND path_id IS NOT NULL ORDER BY pointer ASC";
     }
 
     @Override
@@ -32,11 +32,11 @@ public class PathListSelectionFromRouteId extends SelectionQuery {
 
         while (rs.next()) {
             path = new Path();
-            path.setPath_id(rs.getString("PATH_ID"));
-            path.setExpense(rs.getInt("EXPENSE"));
-            path.setDuration(rs.getInt("DURATION"));
-            path.setComment(rs.getString("COMMENT_DESC"));
-            path.setIndex(rs.getInt("POINTER"));
+            path.setPath_id(rs.getString("path_id"));
+            path.setExpense(rs.getInt("expense"));
+            path.setDuration(rs.getInt("duration"));
+            path.setComment(rs.getString("comment_desc"));
+            path.setIndex(rs.getInt("pointer"));
 
             list.add(path);
         }

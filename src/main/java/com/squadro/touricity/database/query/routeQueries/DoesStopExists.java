@@ -17,13 +17,13 @@ public class DoesStopExists extends SelectionQuery {
 
     @Override
     public String getQuery() {
-        return "SELECT COUNT(*) FROM db_stop WHERE STOP_ID = '" + stop_id + "'";
+        return "SELECT COUNT(*) FROM db_stop WHERE stop_id = '" + stop_id + "'";
     }
 
     @Override
     public boolean onResult(QueryResult result) throws SQLException {
         ResultSet rs = result.getResultSet();
-        if(rs.getRow() == 0)
+        if(!rs.next())
             doesStopExists = false;
         else
             doesStopExists = true;

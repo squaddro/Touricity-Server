@@ -17,7 +17,7 @@ public class CityIdSelectionFromRouteId extends SelectionQuery {
 
     @Override
     public String getQuery() {
-        return "SELECT CITY_ID FROM DB_ROUTE WHERE ROUTE_ID = '" + route_id + "'";
+        return "SELECT city_id FROM DB_ROUTE WHERE route_id = '" + route_id + "'";
     }
 
     @Override

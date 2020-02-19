@@ -17,7 +17,7 @@ public class CreatorSelectionFromRouteId extends SelectionQuery {
 
     @Override
     public String getQuery() {
-        return "SELECT CREATOR FROM DB_ROUTE WHERE ROUTE_ID = '" + route_id + "'";
+        return "SELECT creator FROM db_route WHERE route_id = '" + route_id + "'";
     }
 
     @Override

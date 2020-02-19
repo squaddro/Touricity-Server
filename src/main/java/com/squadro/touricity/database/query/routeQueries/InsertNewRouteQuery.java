@@ -38,7 +38,7 @@ public class InsertNewRouteQuery extends InsertionQuery{
             doesRouteExists.execute();
 
             if(doesRouteExists.getDoesRouteExists()){
-                query = "UPDATE db_route SET CREATOR = '" + creator + "', ROUTE_ID = '" + UUID.randomUUID().toString() + "', CITY_ID = '" + city_id + "', TITLE = '" + title + "', ROUTE_DESC = 'dummy desc', PRIVACY =" + privacy;
+                query = "UPDATE db_route SET creator = '" + creator + "', route_id = '" + UUID.randomUUID().toString() + "', city_id = '" + city_id + "', title = '" + title + "', route_desc = 'dummy desc', privacy =" + privacy;
             }
         }
 

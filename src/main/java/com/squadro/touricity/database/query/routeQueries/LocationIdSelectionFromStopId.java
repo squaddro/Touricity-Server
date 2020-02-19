@@ -19,7 +19,7 @@ public class LocationIdSelectionFromStopId extends SelectionQuery {
 
     @Override
     public String getQuery() {
-        return "SELECT LOCATION_ID FROM DB_STOP WHERE STOP_ID = '" + stop_id + "'";
+        return "SELECT location_id FROM db_stop WHERE stop_id = '" + stop_id + "'";
     }
 
     @Override
