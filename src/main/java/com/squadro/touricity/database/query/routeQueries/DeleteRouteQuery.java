@@ -18,7 +18,7 @@ public class DeleteRouteQuery extends DeletionQuery {
 
     @Override
     public String getQuery() {
-        return "DELETE FROM DB_ROUTE WHERE ROUTE_ID = " + route_id;
+        return "DELETE FROM DB_ROUTE WHERE ROUTE_ID = '" + route_id + "'";
     }
 
     @Override

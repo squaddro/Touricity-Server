@@ -17,7 +17,7 @@ public class CityIdSelectionFromRouteId extends SelectionQuery {
 
     @Override
     public String getQuery() {
-        return "SELECT CITY_ID FROM DB_ROUTE WHERE ROUTE_ID = " + route_id.toUpperCase();
+        return "SELECT CITY_ID FROM DB_ROUTE WHERE ROUTE_ID = '" + route_id + "'";
     }
 
     @Override

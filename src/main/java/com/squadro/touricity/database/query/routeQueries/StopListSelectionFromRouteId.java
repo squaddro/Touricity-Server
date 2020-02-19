@@ -23,7 +23,7 @@ public class StopListSelectionFromRouteId extends SelectionQuery {
 
     @Override
     public String getQuery() { //TODO: select Entry_id
-        return "SELECT STOP_ID,EXPENSE,DURATION,COMMENT_DESC,POINTER FROM DB_ENTRY WHERE ROUTE_ID = " + route_id + "AND STOP_ID IS NOT NULL ORDER BY POINTER ASC";
+        return "SELECT STOP_ID,EXPENSE,DURATION,COMMENT_DESC,POINTER FROM DB_ENTRY WHERE ROUTE_ID = '" + route_id + "' AND STOP_ID IS NOT NULL ORDER BY POINTER ASC";
     }
 
     @Override

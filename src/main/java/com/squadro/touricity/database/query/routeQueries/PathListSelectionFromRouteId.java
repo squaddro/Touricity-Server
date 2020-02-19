@@ -22,7 +22,7 @@ public class PathListSelectionFromRouteId extends SelectionQuery {
 
     @Override
     public String getQuery() { //TODO: select Entry_id
-        return "SELECT PATH_ID,EXPENSE,DURATION,COMMENT_DESC,POINTER FROM DB_ENTRY WHERE ROUTE_ID = " + route_id + "AND PATH_ID IS NOT NULL ORDER BY POINTER ASC";
+        return "SELECT PATH_ID,EXPENSE,DURATION,COMMENT_DESC,POINTER FROM DB_ENTRY WHERE ROUTE_ID = '" + route_id + "' AND PATH_ID IS NOT NULL ORDER BY POINTER ASC";
     }
 
     @Override

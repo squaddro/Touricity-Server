@@ -25,7 +25,7 @@ public class VerticesSelectionFromPathId extends SelectionQuery {
 
     @Override
     public String getQuery() {
-        return "SELECT VERTICES FROM DB_PATH WHERE PATH_ID = " + path_id;
+        return "SELECT VERTICES FROM DB_PATH WHERE PATH_ID = '" + path_id + "'";
     }
 
     @Override

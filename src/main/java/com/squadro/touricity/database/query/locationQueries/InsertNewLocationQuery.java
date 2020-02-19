@@ -22,7 +22,7 @@ public class InsertNewLocationQuery extends InsertionQuery {
 
 	@Override
 	public String getQuery() {
-		return "INSERT INTO DB_LOCATION VALUES(" + location_id + ",NULL," + latitude + "," + longitude + ")";
+		return "INSERT INTO DB_LOCATION VALUES('" + location_id + "',NULL," + latitude + "," + longitude + ")";
 	}
 
 	@Override

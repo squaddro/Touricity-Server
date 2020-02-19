@@ -18,7 +18,7 @@ public class PathTypeSelectionFromPathId extends SelectionQuery {
 
     @Override
     public String getQuery() {
-        return "SELECT PATH_TYPE FROM DB_PATH WHERE PATH_ID = " + path_id;
+        return "SELECT PATH_TYPE FROM DB_PATH WHERE PATH_ID = '" + path_id + "'";
     }
 
     @Override

@@ -17,7 +17,7 @@ public class UpdateStopQuery extends UpdateQuery {
 
     @Override
     public String getQuery() {
-        return "UPDATE DB_STOP SET LOCATION_ID =" + this.stop.get().getLocation_id() + "WHERE STOP_ID =" + this.stop.get().getStop_id() + ")";
+        return "UPDATE DB_STOP SET LOCATION_ID ='" + this.stop.get().getLocation_id() + "' WHERE STOP_ID ='" + this.stop.get().getStop_id() + "')";
     }
 
     @Override
