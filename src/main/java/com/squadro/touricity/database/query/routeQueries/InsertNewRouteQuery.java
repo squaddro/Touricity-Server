@@ -31,12 +31,11 @@ public class InsertNewRouteQuery extends InsertionQuery{
     public String getQuery() {
 
         String query = null;
-        if(route_id == null){
+        if(route_id.get() == null){
             String newID = UUID.randomUUID().toString();
             query = "INSERT INTO db_route(creator,route_id,city_id,title,route_desc,privacy) VALUES('" + creator + "','" + newID + "','" + city_id + "','" + title + "'," + "'desccc' ," + privacy + ")";
             route_id.set(newID);
         }
-
 
         else{
             DoesRouteExists doesRouteExists = new DoesRouteExists(route_id.get());
