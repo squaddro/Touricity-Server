@@ -27,7 +27,7 @@ public class InsertNewRouteQuery extends InsertionQuery{
 
     @Override
     public String getQuery() {
-        String insertionQuery = "INSERT INTO DB_ROUTE VALUES(creator,route_id,city_id,title,route_desc,privacy)(" + creator + "," + route_id + "," + cityId + "," + title + "," + "NULL ," + privacy + ")";
+        String insertionQuery = "INSERT INTO DB_ROUTE VALUES(creator,route_id,city_id,title,route_desc,privacy)('" + creator + "','" + route_id + "','" + cityId + "','" + title + "'," + "NULL ," + privacy + ")";
         return insertionQuery;
     }
 
