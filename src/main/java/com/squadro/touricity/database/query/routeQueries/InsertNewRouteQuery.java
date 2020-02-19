@@ -12,22 +12,22 @@ public class InsertNewRouteQuery extends InsertionQuery{
     private final String creator;
     private final String route_id;
     private final IEntry[] entries;
-    private final String cityId;
+    private final String city_id;
     private final String title;
     private final int privacy;
 
-    public InsertNewRouteQuery(String route_id, String creator, IEntry[] entries, String cityId, String title, int privacy) {
+    public InsertNewRouteQuery(String route_id, String creator, IEntry[] entries, String city_id, String title, int privacy) {
         this.route_id = route_id;
         this.creator = creator;
         this.entries = entries;
-        this.cityId = cityId;
+        this.city_id = city_id;
         this.title = title;
         this.privacy = privacy;
     }
 
     @Override
     public String getQuery() {
-        String insertionQuery = "INSERT INTO DB_ROUTE VALUES(creator,route_id,city_id,title,route_desc,privacy)('" + creator + "','" + route_id + "','" + cityId + "','" + title + "'," + "NULL ," + privacy + ")";
+        String insertionQuery = "INSERT INTO DB_ROUTE VALUES(creator,route_id,city_id,title,route_desc,privacy)('" + creator + "','" + route_id + "','" + city_id + "','" + title + "'," + "NULL ," + privacy + ")";
         return insertionQuery;
     }
 
@@ -43,6 +43,6 @@ public class InsertNewRouteQuery extends InsertionQuery{
     }
 
     public Route getRoute(){
-        return new Route(creator, route_id, entries, cityId, title, privacy);
+        return new Route(creator, route_id, entries, city_id, title, privacy);
     }
 }
