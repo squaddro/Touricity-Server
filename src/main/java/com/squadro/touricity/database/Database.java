@@ -336,16 +336,7 @@ public class Database {
 		}
 
 		entries = combineSortedStopsAndPaths(stops, paths);
-
-		logger.info("Creator get is : " + creator.get());
-		logger.info("id get is : " + id.get());
-		logger.info("city id get is " + city_id.get());
-		logger.info("title get is : " + title.get());
-		logger.info("privacy get is : " + privacy.get());
-		if(entries == null){
-			logger.info("entries is null");
-		}
-
+		
 		return new Route(creator.get(), id.get(), (IEntry[]) entries.toArray(), city_id.get(), title.get(), privacy.get());
 	}
 
