@@ -1,9 +1,9 @@
 package com.squadro.touricity.controller;
 
 import com.squadro.touricity.database.Database;
+import com.squadro.touricity.message.types.data.RouteId;
 import com.squadro.touricity.message.types.IMessage;
 import com.squadro.touricity.message.types.data.Route;
-import org.slf4j.IMarkerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,11 +18,11 @@ public class RouteController {
     )
     @ResponseBody
     public Route getRouteInfo(
-     @RequestBody String route_id,
+     @RequestBody RouteId route_id,
      @CookieValue(value = "cookie_uuid", defaultValue = "notset") String cookie
     ){
         Route route = null;
-        route = Database.getRouteInfo(route_id);
+        route = Database.getRouteInfo(route_id.getRoute_id());
         return route;
     }
 
