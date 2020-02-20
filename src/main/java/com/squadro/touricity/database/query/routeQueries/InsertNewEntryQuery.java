@@ -18,6 +18,7 @@ public class InsertNewEntryQuery extends InsertionQuery {
     private final String route_id;
     private final AtomicReference<IEntry> entry = new AtomicReference<>();
     private boolean isStop;
+    private String entryQuery = "";
 
     public InsertNewEntryQuery(String route_id, IEntry entry) {
         this.route_id = route_id;
@@ -70,10 +71,9 @@ public class InsertNewEntryQuery extends InsertionQuery {
             if(stop.getStop_id() == null){
                 String newUUID = UUID.randomUUID().toString();
 
-                InsertNewStopQuery insertNewStopQuery = new InsertNewStopQuery(newUUID, stop);
-                insertNewStopQuery.execute();
-                return "INSERT INTO db_entry(route_id,stop_id,path_id,entry_id,expense,duration,comment_desc,pointer) VALUES(" +"'"+ route_id + "','" + newUUID + "'," + "NULL" + ",'"
+                entryQuery = "INSERT INTO db_entry(route_id,stop_id,path_id,entry_id,expense,duration,comment_desc,pointer) VALUES(" +"'"+ route_id + "','" + newUUID + "'," + "NULL" + ",'"
                         + UUID.randomUUID().toString() + "'," + stop.getExpense() + "," + stop.getDuration() + ",'" + stop.getComment() + "'," + stop.getIndex() + ")";
+                return "INSERT INTO DB_stop(location_id, stop_id) VALUES(" + "'" + stop.getLocation_id() + "','" + newUUID + "')";
             }
             else{
                 DoesStopExists doesStopExists = new DoesStopExists(((Stop) entry.get()).getStop_id());
@@ -89,10 +89,9 @@ public class InsertNewEntryQuery extends InsertionQuery {
             if(path.getPath_id() == null){
                 String newUUID = UUID.randomUUID().toString();
 
-                InsertNewPathQuery insertNewPathQuery = new InsertNewPathQuery(newUUID, path);
-                insertNewPathQuery.execute();
-                return "INSERT INTO DB_entry(route_id,stop_id,path_id,entry_id,expense,duration,comment_desc,pointer) VALUES(" + "'" + route_id + "'," + "NULL" + ",'" + newUUID + "','"
+                entryQuery = "INSERT INTO DB_entry(route_id,stop_id,path_id,entry_id,expense,duration,comment_desc,pointer) VALUES(" + "'" + route_id + "'," + "NULL" + ",'" + newUUID + "','"
                         + UUID.randomUUID().toString() + "'," + path.getExpense() + "," + path.getDuration() + ",'" + path.getComment() + "'," + path.getIndex() + ")";
+                return "INSERT INTO DB_path(path_id,path_type,vertices) VALUES('" + newUUID + "'," + path.getPath_type() + "," + vertexArrayToByteArray(path.getVertices()) + ")";
             }
             else{
                 DoesPathExists doesPathExists = new DoesPathExists(((Path) entry.get()).getPath_id());
@@ -109,9 +108,34 @@ public class InsertNewEntryQuery extends InsertionQuery {
 
     @Override
     public boolean onResult(QueryResult result) throws SQLException {
+
+        if(!entryQuery.equals("")){
+            if(isStop){
+                InsertNewStopQuery insertNewStopQuery = new InsertNewStopQuery(entryQuery);
+                insertNewStopQuery.execute();
+            }
+            else{
+                InsertNewPathQuery insertNewPathQuery = new InsertNewPathQuery(entryQuery);
+                insertNewPathQuery.execute();
+            }
+        }
+
+
         return false;
     }
     public IEntry getEntry(){
         return entry.get();
+    }
+
+    private static byte[] vertexArrayToByteArray(IPath.PathVertex[] vertices) {
+        try{
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ObjectOutputStream os = new ObjectOutputStream(out);
+            os.writeObject(vertices);
+            return out.toByteArray();
+        }catch (Exception e){
+            e.getStackTrace();
+            return null;
+        }
     }
 }

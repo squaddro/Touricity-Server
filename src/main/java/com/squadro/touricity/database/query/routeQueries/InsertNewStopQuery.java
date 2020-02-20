@@ -8,17 +8,15 @@ import java.sql.SQLException;
 
 public class InsertNewStopQuery extends InsertionQuery {
 
-    private final Stop stop;
-    private final String newUUID;
+    private final String entryQuery;
 
-    public InsertNewStopQuery(String newUUID, Stop stop) {
-        this.stop = stop;
-        this.newUUID = newUUID;
+    public InsertNewStopQuery(String entryQuery) {
+        this.entryQuery = entryQuery;
     }
 
     @Override
     public String getQuery() {
-        return "INSERT INTO DB_stop(location_id, stop_id) VALUES(" + "'" + stop.getLocation_id() + "','" + newUUID + "')";
+        return entryQuery;
     }
 
     @Override

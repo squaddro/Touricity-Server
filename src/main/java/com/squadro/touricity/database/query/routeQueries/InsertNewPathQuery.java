@@ -12,33 +12,19 @@ import java.sql.SQLException;
 
 public class InsertNewPathQuery extends InsertionQuery {
 
-    private final Path path;
-    private final String newUUID;
+    private final String entryQuery;
 
-    public InsertNewPathQuery(String newUUID, Path path) {
-        this.newUUID = newUUID;
-        this.path = path;
+    public InsertNewPathQuery(String entryQuery) {
+        this.entryQuery = entryQuery;
     }
 
     @Override
     public String getQuery() {
-        return "INSERT INTO DB_path(path_id,path_type,vertices) VALUES('" + newUUID + "'," + path.getPath_type() + "," + vertexArrayToByteArray(path.getVertices()) + ")";
+        return entryQuery;
     }
 
     @Override
     public boolean onResult(QueryResult result) throws SQLException {
         return false;
-    }
-
-    private static byte[] vertexArrayToByteArray(IPath.PathVertex[] vertices) {
-        try{
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            ObjectOutputStream os = new ObjectOutputStream(out);
-            os.writeObject(vertices);
-            return out.toByteArray();
-        }catch (Exception e){
-            e.getStackTrace();
-            return null;
-        }
     }
 }
