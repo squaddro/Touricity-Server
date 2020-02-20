@@ -220,8 +220,7 @@ public class Database {
 	}
 
 	public static IMessage createLocation(Location location) {
-		InsertNewLocationQuery newLocationQuery = new InsertNewLocationQuery(location.getLocation_id(),
-				location.getLongitude(), location.getLatitude());
+		InsertNewLocationQuery newLocationQuery = new InsertNewLocationQuery(location.getLongitude(), location.getLatitude());
 		newLocationQuery.execute();
 		if(newLocationQuery.isSuccessfull()){
 			return Status.build(StatusCode.INSERT_LOCATION_SUCCESSFULL);

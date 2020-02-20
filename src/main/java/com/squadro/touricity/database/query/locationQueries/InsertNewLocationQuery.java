@@ -4,17 +4,15 @@ import com.squadro.touricity.database.query.InsertionQuery;
 import com.squadro.touricity.database.result.QueryResult;
 
 import java.sql.SQLException;
+import java.util.UUID;
 
 public class InsertNewLocationQuery extends InsertionQuery {
 
-	private final String location_id;
 	private final double longitude;
 	private final double latitude;
-
 	private boolean isSuccessfull;
 
-	public InsertNewLocationQuery(String location_id, double longitude, double latitude) {
-		this.location_id = location_id;
+	public InsertNewLocationQuery(double longitude, double latitude) {
 		this.longitude = longitude;
 		this.latitude = latitude;
 		isSuccessfull = false;
@@ -22,6 +20,7 @@ public class InsertNewLocationQuery extends InsertionQuery {
 
 	@Override
 	public String getQuery() {
+		String location_id = UUID.randomUUID().toString();
 		return "INSERT INTO DB_LOCATION VALUES('" + location_id + "',NULL," + latitude + "," + longitude + ")";
 	}
 
