@@ -91,7 +91,7 @@ public class InsertNewEntryQuery extends InsertionQuery {
 
                 entryQuery = "INSERT INTO DB_entry(route_id,stop_id,path_id,entry_id,expense,duration,comment_desc,pointer) VALUES(" + "'" + route_id + "'," + "NULL" + ",'" + newUUID + "','"
                         + UUID.randomUUID().toString() + "'," + path.getExpense() + "," + path.getDuration() + ",'" + path.getComment() + "'," + path.getIndex() + ")";
-                return "INSERT INTO DB_path(path_id,path_type,vertices) VALUES('" + newUUID + "'," + path.getPath_type() + "," + vertexArrayToByteArray(path.getVertices()) + ")";
+                return "INSERT INTO DB_path(path_id,path_type,vertices) VALUES('" + newUUID + "'," + path.getPath_typeAsInt() + "," + vertexArrayToByteArray(path.getVertices()) + ")";
             }
             else{
                 DoesPathExists doesPathExists = new DoesPathExists(((Path) entry.get()).getPath_id());

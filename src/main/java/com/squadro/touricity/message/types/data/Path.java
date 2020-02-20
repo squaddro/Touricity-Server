@@ -36,9 +36,21 @@ public class Path extends Entry implements IPath {
 		return path_id;
 	}
 
-	public PathType getPath_type() {
+	public int getPath_typeAsInt() {
+		if(path_type.equals(PathType.WALKING))
+			return 0;
+		else if(path_type.equals(PathType.BUS))
+			return 1;
+		else if(path_type.equals(PathType.DRIVING))
+			return 2;
+		else
+			return 3;
+	}
+
+	public PathType getPath_type(){
 		return path_type;
 	}
+
 
 	public PathVertex[] getVertices() {
 		return vertices;
