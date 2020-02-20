@@ -11,11 +11,9 @@ public class CreatorSelectionFromRouteId extends SelectionQuery {
 
     private final AtomicReference<String> creator = new AtomicReference<>();
     private final String route_id;
-    private final CountDownLatch countDownLatch;
 
     public CreatorSelectionFromRouteId(String route_id) {
         this.route_id = route_id;
-        countDownLatch = new CountDownLatch(1);
     }
 
     @Override
@@ -27,16 +25,13 @@ public class CreatorSelectionFromRouteId extends SelectionQuery {
     public boolean onResult(QueryResult result) throws SQLException {
         if(result.getResultSet().next()){
             creator.set(result.getResultSet().getString("creator"));
-            countDownLatch.countDown();
         }
         return false;
     }
 
     public String getCreator(){
-        try {
-            countDownLatch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        while(creator.get() == null){
+
         }
         return creator.get();
     }
