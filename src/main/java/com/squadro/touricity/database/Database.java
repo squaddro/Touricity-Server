@@ -300,12 +300,14 @@ public class Database {
 		StopListSelectionFromRouteId stopListSelectionFromRouteId = new StopListSelectionFromRouteId(route_id);
 		PathListSelectionFromRouteId pathListSelectionFromRouteId = new PathListSelectionFromRouteId(route_id);
 
-		creatorSelectionFromRouteId.execute();
-		titleSelectionFromRouteId.execute();
-		cityIdSelectionFromRouteId.execute();
-		privacySelectionFromRouteId.execute();
-		stopListSelectionFromRouteId.execute();
-		pathListSelectionFromRouteId.execute();
+		new Thread(() -> {
+			creatorSelectionFromRouteId.execute();
+			titleSelectionFromRouteId.execute();
+			cityIdSelectionFromRouteId.execute();
+			privacySelectionFromRouteId.execute();
+			stopListSelectionFromRouteId.execute();
+			pathListSelectionFromRouteId.execute();
+		}).start();
 
 		creator.set(creatorSelectionFromRouteId.getCreator());
 		title.set(titleSelectionFromRouteId.getTitle());
