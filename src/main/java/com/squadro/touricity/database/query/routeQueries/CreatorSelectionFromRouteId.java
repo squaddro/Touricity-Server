@@ -22,7 +22,9 @@ public class CreatorSelectionFromRouteId extends SelectionQuery {
 
     @Override
     public boolean onResult(QueryResult result) throws SQLException {
-        creator.set(result.getResultSet().getString("creator"));
+        if(result.getResultSet().next()){
+            creator.set(result.getResultSet().getString("creator"));
+        }
         return false;
     }
 

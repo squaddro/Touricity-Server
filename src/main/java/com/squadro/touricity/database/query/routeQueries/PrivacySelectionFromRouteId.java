@@ -23,7 +23,9 @@ public class PrivacySelectionFromRouteId extends SelectionQuery {
 
     @Override
     public boolean onResult(QueryResult result) throws SQLException {
-        privacy.set(result.getResultSet().getInt("privacy"));
+        if(result.getResultSet().next()){
+            privacy.set(result.getResultSet().getInt("privacy"));
+        }
         return false;
     }
 

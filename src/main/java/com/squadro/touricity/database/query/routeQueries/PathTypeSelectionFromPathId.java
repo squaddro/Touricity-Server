@@ -23,8 +23,9 @@ public class PathTypeSelectionFromPathId extends SelectionQuery {
 
     @Override
     public boolean onResult(QueryResult result) throws SQLException {
-        ResultSet rs = result.getResultSet();
-        pathType.set(rs.getInt("path_type"));
+        if(result.getResultSet().next()){
+            pathType.set(result.getResultSet().getInt("path_type"));
+        }
         return false;
     }
 
