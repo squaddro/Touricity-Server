@@ -21,18 +21,14 @@ public class CreatorSelectionFromRouteId extends SelectionQuery {
 
 	@Override
 	public String getQuery() {
-		logger.info("route id is " + route_id);
 	    return "SELECT creator FROM db_route WHERE route_id = '" + route_id + "'";
 	}
 
 	@Override
 	public boolean onResult(QueryResult result) throws SQLException {
-		if (result.isSuccessfull()) {
-		    logger.info("creator is " + result.getResultSet().getString("creator"));
+		if (result.getResultSet().next()) {
 			creator.set(result.getResultSet().getString("creator"));
-		}else{
-		    logger.info("creator result set is empty");
-        }
+		}
 		return false;
 	}
 
