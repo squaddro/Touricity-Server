@@ -2,8 +2,8 @@ package com.squadro.touricity.controller;
 
 import com.squadro.touricity.database.Database;
 import com.squadro.touricity.message.types.IMessage;
-import com.squadro.touricity.message.types.data.Filter;
 import com.squadro.touricity.message.types.data.Location;
+import com.squadro.touricity.message.types.data.LocationId;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,10 +30,12 @@ public class LocationController {
 	)
 	@ResponseBody
 	public IMessage getLocationInfo(
-			@RequestBody String location_id,
+			@RequestBody LocationId location_id,
 			@CookieValue(value = "cookie_uuid", defaultValue = "notset") String cookie
 	) {
-		return Database.getLocationInfo(location_id);
+		Location location = null;
+		location = Database.getLocationInfo(location_id.getLocation_id());
+		return location;
 	}
 }
 
