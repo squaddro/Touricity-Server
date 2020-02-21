@@ -134,7 +134,6 @@ public class Database {
 				case SELECT:
 					resultSet = stmt.executeQuery();
 					successful = resultSet.next();
-					resultSet.previous();
 					break;
 			}
 

@@ -31,7 +31,7 @@ public class VerticesSelectionFromPathId extends SelectionQuery {
     @Override
     public boolean onResult(QueryResult result) throws SQLException {
         ResultSet rs = result.getResultSet();
-        if(rs.next()){
+        if(result.isSuccessfull()){
             vertices = Arrays.asList(byteArrayToVerticesArray(rs.getBytes("vertices")));
         }
         return false;

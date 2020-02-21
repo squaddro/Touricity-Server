@@ -24,7 +24,7 @@ public class LocationIdSelectionFromStopId extends SelectionQuery {
 
     @Override
     public boolean onResult(QueryResult result) throws SQLException {
-        if(result.getResultSet().next()){
+        if(result.isSuccessfull()){
             location_id.set(result.getResultSet().getString("location_id"));
         }
         return false;

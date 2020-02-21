@@ -17,13 +17,12 @@ public class DoesPathExists extends SelectionQuery {
 
     @Override
     public String getQuery() {
-        return "SELECT COUNT(*) FROM db_path WHERE path_id = '" + path_id + "'";
+        return "SELECT COUNT(*) FROM db_path WHERE path_id = '" + path_id + "' HAVING COUNT(*) > 0 " ;
     }
 
     @Override
     public boolean onResult(QueryResult result) throws SQLException {
-        ResultSet rs = result.getResultSet();
-        if(!rs.next())
+        if(!result.isSuccessfull())
             doesPathExists = false;
         else
             doesPathExists = true;

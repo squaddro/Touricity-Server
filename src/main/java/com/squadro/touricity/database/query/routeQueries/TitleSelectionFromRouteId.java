@@ -22,7 +22,7 @@ public class TitleSelectionFromRouteId extends SelectionQuery {
 
     @Override
     public boolean onResult(QueryResult result) throws SQLException {
-        if(result.getResultSet().next()){
+        if(result.isSuccessfull()){
             title.set(result.getResultSet().getString("title"));
         }
         return false;

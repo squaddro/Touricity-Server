@@ -22,7 +22,7 @@ public class CityIdSelectionFromRouteId extends SelectionQuery {
 
     @Override
     public boolean onResult(QueryResult result) throws SQLException {
-        if(result.getResultSet().next()){
+        if(result.isSuccessfull()){
             cityId.set(result.getResultSet().getString("city_id"));
         }
         return false;
