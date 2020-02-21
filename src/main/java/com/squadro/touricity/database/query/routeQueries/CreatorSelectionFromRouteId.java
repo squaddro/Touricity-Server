@@ -27,7 +27,7 @@ public class CreatorSelectionFromRouteId extends SelectionQuery {
 
 	@Override
 	public boolean onResult(QueryResult result) throws SQLException {
-		if (result.getResultSet().next()) {
+		if (result.isSuccessfull()) {
 		    logger.info("creator is " + result.getResultSet().getString("creator"));
 			creator.set(result.getResultSet().getString("creator"));
 		}else{
