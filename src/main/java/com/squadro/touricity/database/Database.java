@@ -6,6 +6,7 @@ import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromCi
 import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromCostAndDuration;
 import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromLike;
 import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromTransportation;
+import com.squadro.touricity.database.query.locationQueries.GetLocationInfoQuery;
 import com.squadro.touricity.database.query.locationQueries.InsertNewLocationQuery;
 import com.squadro.touricity.database.query.pipeline.IPipelinedQuery;
 import com.squadro.touricity.database.query.pipeline.PipelinedQuery;
@@ -240,39 +241,9 @@ public class Database {
 	}
 
 	public static Location getLocationInfo(String location_id){
-		final AtomicReference<String> id = new AtomicReference<>();
-		final AtomicReference<String> city_id = new AtomicReference<>();
-		final AtomicReference<Double> latitude = new AtomicReference<>();
-		final AtomicReference<Double> longitude = new AtomicReference<>();
-
-		id.set(location_id);
-		getInstance().execute(new PipelinedQuery() {
-
-			protected void PrepareQueue(Queue<ISingleQuery> queue) {
-
-				queue.add(new SelectionQuery() {
-
-					public String getQuery() {
-						String locationIdQuery = "SELECT * FROM DB_LOCATION WHERE LOCATION_ID = " + id.get();
-						return locationIdQuery;
-					}
-
-					public boolean onResult(QueryResult result) throws SQLException {
-
-						ResultSet rs = result.getResultSet();
-
-						city_id.set(rs.getString(LOCATION_CITY_ID));
-						latitude.set(rs.getDouble(LOCATION_LATITUDE));
-						longitude.set(rs.getDouble(LOCATION_LONGITUDE));
-
-						return true;
-					}
-				});
-			}
-		});
-
-		Location location = new Location(id.get(), city_id.get(), latitude.get(), longitude.get());
-		return location;
+		GetLocationInfoQuery locationInfoQuery = new GetLocationInfoQuery(location_id);
+		locationInfoQuery.execute();
+		return locationInfoQuery.getLocation();
 	}
 
 	public static Route insertRoute(Route route) {
