@@ -19,13 +19,14 @@ public class LocationIdSelectionFromStopId extends SelectionQuery {
 
     @Override
     public String getQuery() {
-        return "SELECT LOCATION_ID FROM DB_STOP WHERE STOP_ID = " + stop_id;
+        return "SELECT location_id FROM db_stop WHERE stop_id = '" + stop_id + "'";
     }
 
     @Override
     public boolean onResult(QueryResult result) throws SQLException {
-        ResultSet rs = result.getResultSet();
-        location_id.set(rs.getString("location_id"));
+        if(result.isSuccessfull()){
+            location_id.set(result.getResultSet().getString("location_id"));
+        }
         return false;
     }
 

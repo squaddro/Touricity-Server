@@ -25,13 +25,15 @@ public class VerticesSelectionFromPathId extends SelectionQuery {
 
     @Override
     public String getQuery() {
-        return "SELECT VERTICES FROM DB_PATH WHERE PATH_ID = " + path_id;
+        return "SELECT vertices FROM db_path WHERE path_id = '" + path_id + "'";
     }
 
     @Override
     public boolean onResult(QueryResult result) throws SQLException {
         ResultSet rs = result.getResultSet();
-        vertices = Arrays.asList(byteArrayToVerticesArray(rs.getBytes("vertices")));
+        if(result.isSuccessfull()){
+            vertices = Arrays.asList(byteArrayToVerticesArray(rs.getBytes("vertices")));
+        }
         return false;
     }
 

@@ -18,12 +18,14 @@ public class PrivacySelectionFromRouteId extends SelectionQuery {
 
     @Override
     public String getQuery() {
-        return "SELECT PRIVACY FROM DB_ROUTE WHERE ROUTE_ID = " + route_id.toUpperCase();
+        return "SELECT privacy FROM db_route WHERE route_id = '" + route_id + "'";
     }
 
     @Override
     public boolean onResult(QueryResult result) throws SQLException {
-        privacy.set(result.getResultSet().getInt("privacy"));
+        if(result.isSuccessfull()){
+            privacy.set(result.getResultSet().getInt("privacy"));
+        }
         return false;
     }
 

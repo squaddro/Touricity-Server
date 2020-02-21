@@ -17,12 +17,14 @@ public class CityIdSelectionFromRouteId extends SelectionQuery {
 
     @Override
     public String getQuery() {
-        return "SELECT CITY_ID FROM DB_ROUTE WHERE ROUTE_ID = " + route_id.toUpperCase();
+        return "SELECT city_id FROM DB_ROUTE WHERE route_id = '" + route_id + "'";
     }
 
     @Override
     public boolean onResult(QueryResult result) throws SQLException {
-        cityId.set(result.getResultSet().getString("city_id"));
+        if(result.isSuccessfull()){
+            cityId.set(result.getResultSet().getString("city_id"));
+        }
         return false;
     }
 

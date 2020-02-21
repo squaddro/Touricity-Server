@@ -17,12 +17,14 @@ public class TitleSelectionFromRouteId extends SelectionQuery {
 
     @Override
     public String getQuery() {
-        return "SELECT TITLE FROM DB_ROUTE WHERE ROUTE_ID = " + route_id.toUpperCase();
+        return "SELECT title FROM db_route WHERE route_id = '" + route_id + "'";
     }
 
     @Override
     public boolean onResult(QueryResult result) throws SQLException {
-        title.set(result.getResultSet().getString("title"));
+        if(result.isSuccessfull()){
+            title.set(result.getResultSet().getString("title"));
+        }
         return false;
     }
 

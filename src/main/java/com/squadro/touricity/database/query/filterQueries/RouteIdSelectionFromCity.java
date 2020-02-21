@@ -18,7 +18,7 @@ public class RouteIdSelectionFromCity extends SelectionQuery {
 	}
 
 	public String getQuery() {
-		String cityQuery = "SELECT city_id FROM DB_CITY WHERE " + "city_name" + "=" + city.toUpperCase();
+		String cityQuery = "SELECT city_id FROM DB_CITY WHERE " + "city_name" + "= '" + city + "'";
 		return "SELECT route_id FROM DB_ROUTE WHERE " + "(" + cityQuery + ") AND privacy = 0";
 	}
 

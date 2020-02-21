@@ -18,13 +18,14 @@ public class PathTypeSelectionFromPathId extends SelectionQuery {
 
     @Override
     public String getQuery() {
-        return "SELECT PATH_TYPE FROM DB_PATH WHERE PATH_ID = " + path_id;
+        return "SELECT path_type FROM db_path WHERE path_id = '" + path_id + "'";
     }
 
     @Override
     public boolean onResult(QueryResult result) throws SQLException {
-        ResultSet rs = result.getResultSet();
-        pathType.set(rs.getInt("path_type"));
+        if(result.isSuccessfull()){
+            pathType.set(result.getResultSet().getInt("path_type"));
+        }
         return false;
     }
 

@@ -220,8 +220,7 @@ public class Database {
 	}
 
 	public static IMessage createLocation(Location location) {
-		InsertNewLocationQuery newLocationQuery = new InsertNewLocationQuery(location.getLocation_id(),
-				location.getLongitude(), location.getLatitude());
+		InsertNewLocationQuery newLocationQuery = new InsertNewLocationQuery(location.getLongitude(), location.getLatitude());
 		newLocationQuery.execute();
 		if(newLocationQuery.isSuccessfull()){
 			return Status.build(StatusCode.INSERT_LOCATION_SUCCESSFULL);
@@ -277,8 +276,6 @@ public class Database {
 	}
 
 	public static Route insertRoute(Route route) {
-		final AtomicReference<Route> finalRoute = new AtomicReference<>();
-
 		InsertNewRouteQuery insertNewRouteQuery = new InsertNewRouteQuery(route.getRoute_id(), route.getCreator(), route.getEntries(), route.getCity_id(), route.getTitle(), route.getPrivacy());
 		insertNewRouteQuery.execute();
 
@@ -339,7 +336,7 @@ public class Database {
 		}
 
 		entries = combineSortedStopsAndPaths(stops, paths);
-
+		
 		return new Route(creator.get(), id.get(), (IEntry[]) entries.toArray(), city_id.get(), title.get(), privacy.get());
 	}
 

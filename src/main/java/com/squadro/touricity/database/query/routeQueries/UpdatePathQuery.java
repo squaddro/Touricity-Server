@@ -20,8 +20,8 @@ public class UpdatePathQuery extends UpdateQuery {
 
     @Override
     public String getQuery() {
-        return "UPDATE DB_PATH SET PATH_ID = " + path.get().getPath_id() + ", PATH_TYPE = " + path.get().getPath_type() + ", VERTICES = "
-                + vertexArrayToByteArray(path.get().getVertices()) + "WHERE PATH_ID = " + path.get().getPath_id() + ")";
+        return "UPDATE db_path SET path_id = '" + path.get().getPath_id() + "', path_type = " + path.get().getPath_type() + ", vertices = "
+                + vertexArrayToByteArray(path.get().getVertices()) + "WHERE path_id = '" + path.get().getPath_id() + "'";
     }
 
     @Override

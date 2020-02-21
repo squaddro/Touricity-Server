@@ -7,7 +7,7 @@ public class Route implements IRoute {
 	private String creator;
 	private String route_id;
 	private IEntry[] entries;
-	private String cityId;
+	private String city_id;
 	private String title;
 	private int privacy;
 	
@@ -21,11 +21,11 @@ public class Route implements IRoute {
 		this.entries = entries;
 	}
 
-	public Route(String creator, String route_id, IEntry[] entries, String cityId, String title, int privacy){
+	public Route(String creator, String route_id, IEntry[] entries, String city_id, String title, int privacy){
 		this.creator = creator;
 		this.route_id = route_id;
 		this.entries = entries;
-		this.cityId = cityId;
+		this.city_id = city_id;
 		this.title = title;
 		this.privacy = privacy;
 	}
@@ -43,7 +43,7 @@ public class Route implements IRoute {
 	}
 
 	public String getCity_id() {
-		return cityId;
+		return city_id;
 	}
 
 	public String getTitle() {
@@ -66,8 +66,8 @@ public class Route implements IRoute {
         entries = setEntries;		
 	}
 
-	public void setCity_id(String cityId) {
-		this.cityId = cityId;
+	public void setCity_id(String city_id) {
+		this.city_id = city_id;
 	}
 
 	public void setTitle(String title) {

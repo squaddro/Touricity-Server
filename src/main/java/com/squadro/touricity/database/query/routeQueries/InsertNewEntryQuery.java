@@ -18,31 +18,48 @@ public class InsertNewEntryQuery extends InsertionQuery {
     private final String route_id;
     private final AtomicReference<IEntry> entry = new AtomicReference<>();
     private boolean isStop;
+    private String entryQuery = "";
 
     public InsertNewEntryQuery(String route_id, IEntry entry) {
         this.route_id = route_id;
         if(entry instanceof Stop){
             if(((Stop) entry).getStop_id() == null){
-                Stop stop = new Stop(((Stop) entry).getLocation_id(), UUID.randomUUID().toString(), entry.getExpense(), entry.getDuration(), entry.getComment(), entry.getIndex());
+                Stop stop = new Stop(((Stop) entry).getLocation_id(), null, entry.getExpense(), entry.getDuration(), entry.getComment(), entry.getIndex());
                 this.entry.set(stop);
                 isStop = true;
             }
             else{
-                Stop stop = new Stop(((Stop) entry).getLocation_id(), ((Stop) entry).getStop_id(), entry.getExpense(), entry.getDuration(), entry.getComment(), entry.getIndex());
-                this.entry.set(stop);
-                isStop = true;
+                DoesStopExists doesStopExists = new DoesStopExists(((Stop) entry).getStop_id());
+                doesStopExists.execute();
+
+                if(doesStopExists.getDoesStopExists()){
+                    Stop stop = new Stop(((Stop) entry).getLocation_id(), ((Stop) entry).getStop_id(), entry.getExpense(), entry.getDuration(), entry.getComment(), entry.getIndex());
+                    this.entry.set(stop);
+                    isStop = true;
+                }
+                else{
+                    //TODO: throw an error.
+                }
             }
 
         }else if(entry instanceof Path){
             if(((Path) entry).getPath_id() == null){
-                Path path = new Path(UUID.randomUUID().toString(), ((Path) entry).getPath_type(), ((Path) entry).getVertices(), entry.getDuration(), entry.getExpense(), entry.getComment(), entry.getIndex());
+                Path path = new Path(null, ((Path) entry).getPath_type(), ((Path) entry).getVertices(), entry.getDuration(), entry.getExpense(), entry.getComment(), entry.getIndex());
                 this.entry.set(path);
                 isStop = false;
             }
             else{
-                Path path = new Path(((Path) entry).getPath_id(), ((Path) entry).getPath_type(), ((Path) entry).getVertices(), entry.getDuration(), entry.getExpense(), entry.getComment(), entry.getIndex());
-                this.entry.set(path);
-                isStop = false;
+                DoesPathExists doesPathExists = new DoesPathExists(((Path) entry).getPath_id());
+                doesPathExists.execute();
+
+                if(doesPathExists.getDoesPathExists()){
+                    Path path = new Path(((Path) entry).getPath_id(), ((Path) entry).getPath_type(), ((Path) entry).getVertices(), entry.getDuration(), entry.getExpense(), entry.getComment(), entry.getIndex());
+                    this.entry.set(path);
+                    isStop = false;
+                }
+                else{
+                    //TODO: throw an error.
+                }
             }
         }
     }
@@ -53,26 +70,37 @@ public class InsertNewEntryQuery extends InsertionQuery {
             Stop stop = (Stop) this.entry.get();
             if(stop.getStop_id() == null){
                 String newUUID = UUID.randomUUID().toString();
-                return "INSERT INTO DB_ENTRY VALUES(" + route_id + "," + newUUID + "," + "NULL" + ","
-                        + UUID.randomUUID().toString() + "," + stop.getExpense() + "," + stop.getDuration() + "," + stop.getComment() + "," + stop.getIndex() + ")" + "\n" +
-                        "INSERT INTO DB_STOP VALUES(" + stop.getLocation_id() + "," + newUUID + ")";
+
+                entryQuery = "INSERT INTO db_entry(route_id,stop_id,path_id,entry_id,expense,duration,comment_desc,pointer) VALUES(" +"'"+ route_id + "','" + newUUID + "'," + "NULL" + ",'"
+                        + UUID.randomUUID().toString() + "'," + stop.getExpense() + "," + stop.getDuration() + ",'" + stop.getComment() + "'," + stop.getIndex() + ")";
+                return "INSERT INTO db_stop(location_id, stop_id) VALUES(" + "'" + stop.getLocation_id() + "','" + newUUID + "')";
             }
-            else{ //assumed that given parameter is a stop and already exists in database.
-                UpdateStopQuery updateStopQuery = new UpdateStopQuery(stop);
-                updateStopQuery.execute();
+            else{
+                DoesStopExists doesStopExists = new DoesStopExists(((Stop) entry.get()).getStop_id());
+                doesStopExists.execute();
+                if(doesStopExists.getDoesStopExists()){
+                    UpdateStopQuery updateStopQuery = new UpdateStopQuery(stop);
+                    updateStopQuery.execute();
+                }
             }
         }
         else{
             Path path = (Path) this.entry.get();
             if(path.getPath_id() == null){
                 String newUUID = UUID.randomUUID().toString();
-                return "INSERT INTO DB_ENTRY VALUES(" + route_id + "," + "NULL" + "," + newUUID + ","
-                        + UUID.randomUUID().toString() + "," + path.getExpense() + "," + path.getDuration() + "," + path.getComment() + "," + path.getIndex() + ")" + "\n" +
-                        "INSERT INTO DB_PATH VALUES(" + newUUID + "," + path.getPath_type() + "," + vertexArrayToByteArray(path.getVertices()) + ")";
+
+                entryQuery = "INSERT INTO DB_entry(route_id,stop_id,path_id,entry_id,expense,duration,comment_desc,pointer) VALUES(" + "'" + route_id + "'," + "NULL" + ",'" + newUUID + "','"
+                        + UUID.randomUUID().toString() + "'," + path.getExpense() + "," + path.getDuration() + ",'" + path.getComment() + "'," + path.getIndex() + ")";
+                return "INSERT INTO db_path(path_id,path_type,vertices) VALUES('" + newUUID + "'," + path.getPath_typeAsInt() + "," + vertexArrayToByteArray(path.getVertices()) + ")";
             }
-            else{ // assumed that given parameter is a path and already exists in database.
-                UpdatePathQuery updatePathQuery = new UpdatePathQuery(path);
-                updatePathQuery.execute();
+            else{
+                DoesPathExists doesPathExists = new DoesPathExists(((Path) entry.get()).getPath_id());
+                doesPathExists.execute();
+
+                if(doesPathExists.getDoesPathExists()){
+                    UpdatePathQuery updatePathQuery = new UpdatePathQuery(path);
+                    updatePathQuery.execute();
+                }
             }
         }
         return null;
@@ -80,7 +108,23 @@ public class InsertNewEntryQuery extends InsertionQuery {
 
     @Override
     public boolean onResult(QueryResult result) throws SQLException {
+
+        if(!entryQuery.equals("")){
+            if(isStop){
+                InsertNewStopQuery insertNewStopQuery = new InsertNewStopQuery(entryQuery);
+                insertNewStopQuery.execute();
+            }
+            else{
+                InsertNewPathQuery insertNewPathQuery = new InsertNewPathQuery(entryQuery);
+                insertNewPathQuery.execute();
+            }
+        }
+
+
         return false;
+    }
+    public IEntry getEntry(){
+        return entry.get();
     }
 
     private static byte[] vertexArrayToByteArray(IPath.PathVertex[] vertices) {
@@ -93,8 +137,5 @@ public class InsertNewEntryQuery extends InsertionQuery {
             e.getStackTrace();
             return null;
         }
-    }
-    public IEntry getEntry(){
-        return entry.get();
     }
 }
