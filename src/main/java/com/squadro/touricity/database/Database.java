@@ -6,6 +6,7 @@ import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromCi
 import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromCostAndDuration;
 import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromLike;
 import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromTransportation;
+import com.squadro.touricity.database.query.likeQueries.GetLikeInfoQuery;
 import com.squadro.touricity.database.query.locationQueries.GetLocationInfoQuery;
 import com.squadro.touricity.database.query.locationQueries.InsertNewLocationQuery;
 import com.squadro.touricity.database.query.pipeline.IPipelinedQuery;
@@ -244,6 +245,12 @@ public class Database {
 		GetLocationInfoQuery locationInfoQuery = new GetLocationInfoQuery(location_id);
 		locationInfoQuery.execute();
 		return locationInfoQuery.getLocation();
+	}
+
+	public static Like getLikeInfo(String like_id){
+		GetLikeInfoQuery likeInfoQuery = new GetLikeInfoQuery(like_id);
+		likeInfoQuery.execute();
+		return likeInfoQuery.getLike();
 	}
 
 	public static Route insertRoute(Route route) {
