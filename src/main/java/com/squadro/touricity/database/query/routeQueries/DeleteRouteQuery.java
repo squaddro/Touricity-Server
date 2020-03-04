@@ -2,17 +2,18 @@ package com.squadro.touricity.database.query.routeQueries;
 
 import com.squadro.touricity.database.query.DeletionQuery;
 import com.squadro.touricity.database.result.QueryResult;
+import com.squadro.touricity.message.types.data.RouteId;
 
 import java.sql.SQLException;
 
 public class DeleteRouteQuery extends DeletionQuery {
 
-    private final String route_id;
+    private final String  route_id;
 
     private boolean isSuccessfull;
 
-    public DeleteRouteQuery(String route_id) {
-        this.route_id = route_id;
+    public DeleteRouteQuery(RouteId route_id) {
+        this.route_id = route_id.getRoute_id();
         isSuccessfull = false;
     }
 

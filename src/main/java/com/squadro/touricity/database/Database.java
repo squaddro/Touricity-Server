@@ -231,7 +231,7 @@ public class Database {
 		}
 	}
 
-	public static IMessage deleteRoute(String routeId) {
+	public static IMessage deleteRoute(RouteId routeId) {
 		DeleteRouteQuery deletingRouteQuery = new DeleteRouteQuery(routeId);
 		deletingRouteQuery.execute();
 		if(deletingRouteQuery.isSuccessfull()) {
