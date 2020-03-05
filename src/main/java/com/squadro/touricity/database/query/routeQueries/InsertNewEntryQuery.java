@@ -70,7 +70,7 @@ public class InsertNewEntryQuery extends InsertionQuery {
             Stop stop = (Stop) this.entry.get();
             if(stop.getStop_id() == null){
                 String newUUID = UUID.randomUUID().toString();
-
+                ((Stop) this.entry.get()).setStop_id(newUUID);
                 entryQuery = "INSERT INTO db_entry(route_id,stop_id,path_id,entry_id,expense,duration,comment_desc,pointer) VALUES(" +"'"+ route_id + "','" + newUUID + "'," + "NULL" + ",'"
                         + UUID.randomUUID().toString() + "'," + stop.getExpense() + "," + stop.getDuration() + ",'" + stop.getComment() + "'," + stop.getIndex() + ")";
                 return "INSERT INTO db_stop(location_id, stop_id) VALUES(" + "'" + stop.getLocation_id() + "','" + newUUID + "')";
@@ -88,7 +88,7 @@ public class InsertNewEntryQuery extends InsertionQuery {
             Path path = (Path) this.entry.get();
             if(path.getPath_id() == null){
                 String newUUID = UUID.randomUUID().toString();
-
+                ((Path) this.entry.get()).setPath_id(newUUID);
                 entryQuery = "INSERT INTO DB_entry(route_id,stop_id,path_id,entry_id,expense,duration,comment_desc,pointer) VALUES(" + "'" + route_id + "'," + "NULL" + ",'" + newUUID + "','"
                         + UUID.randomUUID().toString() + "'," + path.getExpense() + "," + path.getDuration() + ",'" + path.getComment() + "'," + path.getIndex() + ")";
                 return "INSERT INTO db_path(path_id,path_type,vertices) VALUES('" + newUUID + "'," + path.getPath_typeAsInt() + ", '" + ByteArrays.Encoders.encodePathVertexArray(path.getVertices()) + "')";
