@@ -1,5 +1,6 @@
 package com.squadro.touricity.database.query.routeQueries;
 
+import com.squadro.touricity.database.ByteArrays;
 import com.squadro.touricity.database.query.UpdateQuery;
 import com.squadro.touricity.database.result.QueryResult;
 import com.squadro.touricity.message.types.data.IPath;
@@ -20,24 +21,12 @@ public class UpdatePathQuery extends UpdateQuery {
 
     @Override
     public String getQuery() {
-        return "UPDATE db_path SET path_id = '" + path.get().getPath_id() + "', path_type = " + path.get().getPath_type() + ", vertices = "
-                + vertexArrayToByteArray(path.get().getVertices()) + "WHERE path_id = '" + path.get().getPath_id() + "'";
+        return "UPDATE db_path SET path_id = '" + path.get().getPath_id() + "', path_type = " + path.get().getPath_type() + ", vertices = '"
+                + ByteArrays.Encoders.encodePathVertexArray(path.get().getVertices()) + "' WHERE path_id = '" + path.get().getPath_id() + "'";
     }
 
     @Override
     public boolean onResult(QueryResult result) throws SQLException {
         return false;
-    }
-
-    private static byte[] vertexArrayToByteArray(IPath.PathVertex[] vertices) {
-        try{
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            ObjectOutputStream os = new ObjectOutputStream(out);
-            os.writeObject(vertices);
-            return out.toByteArray();
-        }catch (Exception e){
-            e.getStackTrace();
-            return null;
-        }
     }
 }

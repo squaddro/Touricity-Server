@@ -1,14 +1,14 @@
 package com.squadro.touricity.database.query.routeQueries;
 
+import com.squadro.touricity.database.ByteArrays;
 import com.squadro.touricity.database.query.InsertionQuery;
 import com.squadro.touricity.database.result.QueryResult;
 import com.squadro.touricity.message.types.data.IEntry;
 import com.squadro.touricity.message.types.data.IPath;
 import com.squadro.touricity.message.types.data.Path;
 import com.squadro.touricity.message.types.data.Stop;
+import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectOutputStream;
 import java.sql.SQLException;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -91,7 +91,7 @@ public class InsertNewEntryQuery extends InsertionQuery {
 
                 entryQuery = "INSERT INTO DB_entry(route_id,stop_id,path_id,entry_id,expense,duration,comment_desc,pointer) VALUES(" + "'" + route_id + "'," + "NULL" + ",'" + newUUID + "','"
                         + UUID.randomUUID().toString() + "'," + path.getExpense() + "," + path.getDuration() + ",'" + path.getComment() + "'," + path.getIndex() + ")";
-                return "INSERT INTO db_path(path_id,path_type,vertices) VALUES('" + newUUID + "'," + path.getPath_typeAsInt() + "," + vertexArrayToByteArray(path.getVertices()) + ")";
+                return "INSERT INTO db_path(path_id,path_type,vertices) VALUES('" + newUUID + "'," + path.getPath_typeAsInt() + ", '" + ByteArrays.Encoders.encodePathVertexArray(path.getVertices()) + "')";
             }
             else{
                 DoesPathExists doesPathExists = new DoesPathExists(((Path) entry.get()).getPath_id());
@@ -125,17 +125,5 @@ public class InsertNewEntryQuery extends InsertionQuery {
     }
     public IEntry getEntry(){
         return entry.get();
-    }
-
-    private static byte[] vertexArrayToByteArray(IPath.PathVertex[] vertices) {
-        try{
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            ObjectOutputStream os = new ObjectOutputStream(out);
-            os.writeObject(vertices);
-            return out.toByteArray();
-        }catch (Exception e){
-            e.getStackTrace();
-            return null;
-        }
     }
 }

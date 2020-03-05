@@ -18,11 +18,11 @@ public class RouteIdSelectionFromTransportation extends SelectionQuery {
 	}
 
 	public String getQuery() {
-		return "SELECT route_id" +
-				"FROM DB_ENTRY " +
-				"INNER JOIN DB_ROUTE ON DB_ENTRY.route_id = DB_ROUTE.route_id" +
-				"INNER JOIN DB_PATH ON DB_ENTRY.path_id = DB_PATH.path_id" +
-				"WHERE DB_PATH.path_type = " + path_type;
+		return "SELECT route_id " +
+				" FROM DB_ENTRY " +
+				" INNER JOIN DB_ROUTE ON DB_ENTRY.route_id = DB_ROUTE.route_id " +
+				" INNER JOIN DB_PATH ON DB_ENTRY.path_id = DB_PATH.path_id " +
+				" WHERE DB_PATH.path_type = " + path_type;
 	}
 
 	public boolean onResult(QueryResult result) throws SQLException {

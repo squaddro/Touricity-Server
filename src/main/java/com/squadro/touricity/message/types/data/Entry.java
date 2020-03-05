@@ -20,6 +20,7 @@ public abstract class Entry implements IEntry {
 	public String getComment() {
 		return comment;
 	}
+
 	public int getIndex() {return index;}
 
 	public void setDuration(int duration) {

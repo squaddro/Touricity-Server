@@ -41,13 +41,14 @@ CREATE TABLE DB_ENTRY (
        Entry_Id char(36),
        Expense integer,
        Duration integer,
-       Comment_desc varchar(1000)	
+       Comment_desc varchar(1000),
+       Pointer integer
 );
    
 CREATE TABLE DB_PATH (
        Path_Id char(36),
        Path_Type integer,
-       Vertices bytea
+       Vertices varchar(5000)
 );
  
 CREATE TABLE DB_STOP (

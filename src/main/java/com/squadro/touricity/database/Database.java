@@ -61,6 +61,7 @@ public class Database {
 	public final static String ENTRY_EXPENSE = "Expense";
 	public final static String ENTRY_DURATION = "Duration";
 	public final static String ENTRY_COMMENT_DESCRIPTION = "Comment_desc";
+	public final static String ENTRY_POINTER = "Pointer";
 	public final static String PATH = "DB_PATH";
 	public final static String PATH_PATH_ID = "Path_Id";
 	public final static String PATH_PATH_TYPE = "Path_Type";
