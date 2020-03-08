@@ -16,12 +16,14 @@ import java.util.concurrent.atomic.AtomicReference;
 public class InsertNewEntryQuery extends InsertionQuery {
 
     private final String route_id;
+    private final int pointer;
     private final AtomicReference<IEntry> entry = new AtomicReference<>();
     private boolean isStop;
     private String entryQuery = "";
 
-    public InsertNewEntryQuery(String route_id, IEntry entry) {
+    public InsertNewEntryQuery(String route_id, IEntry entry,int pointer) {
         this.route_id = route_id;
+        this.pointer = pointer;
         if(entry instanceof Stop){
             if(((Stop) entry).getStop_id() == null){
                 Stop stop = new Stop(((Stop) entry).getLocation_id(), null, entry.getExpense(), entry.getDuration(), entry.getComment(), entry.getIndex());
@@ -72,7 +74,7 @@ public class InsertNewEntryQuery extends InsertionQuery {
                 String newUUID = UUID.randomUUID().toString();
                 ((Stop) this.entry.get()).setStop_id(newUUID);
                 entryQuery = "INSERT INTO db_entry(route_id,stop_id,path_id,entry_id,expense,duration,comment_desc,pointer) VALUES(" +"'"+ route_id + "','" + newUUID + "'," + "NULL" + ",'"
-                        + UUID.randomUUID().toString() + "'," + stop.getExpense() + "," + stop.getDuration() + ",'" + stop.getComment() + "'," + stop.getIndex() + ")";
+                        + UUID.randomUUID().toString() + "'," + stop.getExpense() + "," + stop.getDuration() + ",'" + stop.getComment() + "'," + pointer+ ")";
                 return "INSERT INTO db_stop(location_id, stop_id) VALUES(" + "'" + stop.getLocation_id() + "','" + newUUID + "')";
             }
             else{
@@ -90,7 +92,7 @@ public class InsertNewEntryQuery extends InsertionQuery {
                 String newUUID = UUID.randomUUID().toString();
                 ((Path) this.entry.get()).setPath_id(newUUID);
                 entryQuery = "INSERT INTO DB_entry(route_id,stop_id,path_id,entry_id,expense,duration,comment_desc,pointer) VALUES(" + "'" + route_id + "'," + "NULL" + ",'" + newUUID + "','"
-                        + UUID.randomUUID().toString() + "'," + path.getExpense() + "," + path.getDuration() + ",'" + path.getComment() + "'," + path.getIndex() + ")";
+                        + UUID.randomUUID().toString() + "'," + path.getExpense() + "," + path.getDuration() + ",'" + path.getComment() + "'," + pointer + ")";
                 return "INSERT INTO db_path(path_id,path_type,vertices) VALUES('" + newUUID + "'," + path.getPath_typeAsInt() + ", '" + ByteArrays.Encoders.encodePathVertexArray(path.getVertices()) + "')";
             }
             else{

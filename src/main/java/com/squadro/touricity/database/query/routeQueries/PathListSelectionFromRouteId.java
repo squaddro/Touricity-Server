@@ -25,7 +25,9 @@ public class PathListSelectionFromRouteId extends SelectionQuery {
 
 	@Override
 	public String getQuery() { //TODO: select Entry_id
-		return "SELECT path_id,expense,duration,comment_desc,pointer FROM db_entry WHERE route_id = '" + route_id + "' AND path_id IS NOT NULL ORDER BY pointer ASC";
+		return "SELECT DB_ENTRY.path_id,expense,duration,comment_desc,pointer,vertices FROM db_entry " +
+				"INNER JOIN DB_PATH ON DB_ENTRY.path_id = DB_PATH.path_id "+
+				"WHERE route_id = '" + route_id + "' AND DB_ENTRY.path_id IS NOT NULL ORDER BY pointer ASC";
 	}
 
 	@Override
