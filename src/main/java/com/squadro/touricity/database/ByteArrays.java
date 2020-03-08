@@ -39,7 +39,7 @@ public class ByteArrays {
 			IPath.PathVertex[] pathVertices = new IPath.PathVertex[doubles.length/2];
 
 			for(int i=0; i<doubles.length; i+=2)
-				pathVertices[i] = new IPath.PathVertex(doubles[i], doubles[i+1]);
+				pathVertices[i/2] = new IPath.PathVertex(doubles[i], doubles[i+1]);
 
 			return pathVertices;
 		}

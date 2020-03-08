@@ -53,7 +53,7 @@ public class InsertNewRouteQuery extends InsertionQuery{
     public boolean onResult(QueryResult result) throws SQLException {
 
         for(int i = 0; i < entries.length; i++) {
-            InsertNewEntryQuery insertNewEntryQuery = new InsertNewEntryQuery(route_id.get(), entries[i]);
+            InsertNewEntryQuery insertNewEntryQuery = new InsertNewEntryQuery(route_id.get(), entries[i],i);
             insertNewEntryQuery.execute();
             entries[i] = insertNewEntryQuery.getEntry();
         }

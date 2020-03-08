@@ -272,51 +272,27 @@ public class Database {
 		final AtomicReference<String> title = new AtomicReference<String>();
 		final AtomicInteger privacy = new AtomicInteger();
 
-		CreatorSelectionFromRouteId creatorSelectionFromRouteId = new CreatorSelectionFromRouteId(route_id);
-		TitleSelectionFromRouteId titleSelectionFromRouteId = new TitleSelectionFromRouteId(route_id);
-		CityIdSelectionFromRouteId cityIdSelectionFromRouteId = new CityIdSelectionFromRouteId(route_id);
-		PrivacySelectionFromRouteId privacySelectionFromRouteId = new PrivacySelectionFromRouteId(route_id);
+		RouteInstancesSelectionFromRouteId routeInstancesSelectionFromRouteId = new RouteInstancesSelectionFromRouteId(route_id);
+		routeInstancesSelectionFromRouteId.execute();
+
+		creator.set(routeInstancesSelectionFromRouteId.getRoute().getCreator());
+		title.set(routeInstancesSelectionFromRouteId.getRoute().getTitle());
+		city_id.set(routeInstancesSelectionFromRouteId.getRoute().getCity_id());
+		privacy.set(routeInstancesSelectionFromRouteId.getRoute().getPrivacy());
+
 		StopListSelectionFromRouteId stopListSelectionFromRouteId = new StopListSelectionFromRouteId(route_id);
 		PathListSelectionFromRouteId pathListSelectionFromRouteId = new PathListSelectionFromRouteId(route_id);
 
-		creatorSelectionFromRouteId.execute();
-		titleSelectionFromRouteId.execute();
-		cityIdSelectionFromRouteId.execute();
-		privacySelectionFromRouteId.execute();
 		stopListSelectionFromRouteId.execute();
 		pathListSelectionFromRouteId.execute();
 
-		creator.set(creatorSelectionFromRouteId.getCreator());
-		title.set(titleSelectionFromRouteId.getTitle());
-		city_id.set(cityIdSelectionFromRouteId.getCityId());
-		privacy.set(privacySelectionFromRouteId.getPrivacy());
 		stops.addAll(stopListSelectionFromRouteId.getList());
 		paths.addAll(pathListSelectionFromRouteId.getList());
 
-
-		for(int i = 0 ; i<stops.size() ; i++) {
-			String stop_id = ((Stop)stops.get(i)).getStop_id();
-			LocationIdSelectionFromStopId locationIdSelectionFromStopId = new LocationIdSelectionFromStopId(stop_id);
-			locationIdSelectionFromStopId.execute();
-			((Stop)stops.get(i)).setLocation_id(locationIdSelectionFromStopId.getLocationId());
-		}
-
-		for(int i = 0 ; i < paths.size() ; i++) {
-			String pathId = ((Path)paths.get(i)).getPath_id();
-
-			PathTypeSelectionFromPathId pathTypeSelectionFromPathId = new PathTypeSelectionFromPathId(pathId);
-			VerticesSelectionFromPathId verticesSelectionFromPathId = new VerticesSelectionFromPathId(pathId);
-
-			pathTypeSelectionFromPathId.execute();
-			verticesSelectionFromPathId.execute();
-
-			((Path) paths.get(i)).setPath_type(PathType.values()[pathTypeSelectionFromPathId.getPathType()]);
-			((Path) (paths.get(i))).setVertices(verticesSelectionFromPathId.getVertices());
-		}
-
 		entries = combineSortedStopsAndPaths(stops, paths);
+		IEntry[] entriesArr = entries.toArray(new IEntry[entries.size()]);
 		
-		return new Route(creator.get(), id.get(), (IEntry[]) entries.toArray(), city_id.get(), title.get(), privacy.get());
+		return new Route(creator.get(), id.get(), entriesArr, city_id.get(), title.get(), privacy.get());
 	}
 
 	private static List<IEntry> combineSortedStopsAndPaths(List<IEntry> stops, List<IEntry> paths) {
