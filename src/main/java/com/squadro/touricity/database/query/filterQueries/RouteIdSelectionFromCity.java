@@ -3,6 +3,7 @@ package com.squadro.touricity.database.query.filterQueries;
 import com.squadro.touricity.database.query.SelectionQuery;
 import com.squadro.touricity.database.result.QueryResult;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,13 +19,17 @@ public class RouteIdSelectionFromCity extends SelectionQuery {
 	}
 
 	public String getQuery() {
-		String cityQuery = "SELECT city_id FROM DB_CITY WHERE " + "city_name" + "= '" + city + "'";
-		return "SELECT route_id FROM DB_ROUTE WHERE " + "(" + cityQuery + ") AND privacy = 0";
+		return "SELECT route_id, city_id FROM DB_ROUTE WHERE city_id in " +
+				"( SELECT city_id FROM DB_CITY WHERE city_name = '" + city + "') " +
+				"AND privacy = 2";
 	}
 
 	public boolean onResult(QueryResult result) throws SQLException {
-		while (result.getResultSet().next()) {
-			list.add(result.getResultSet().getString("route_id"));
+		ResultSet rs = result.getResultSet();
+		if(result.isSuccessfull()){
+			do{
+				list.add(rs.getString("route_id"));
+			}while(rs.next());
 		}
 		return false;
 	}

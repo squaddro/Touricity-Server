@@ -3,6 +3,7 @@ package com.squadro.touricity.database.query.filterQueries;
 import com.squadro.touricity.database.query.SelectionQuery;
 import com.squadro.touricity.database.result.QueryResult;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,14 +21,18 @@ public class RouteIdSelectionFromCostAndDuration extends SelectionQuery {
 	}
 
 	public String getQuery() {
-		return "SELECT route_id,SUM(expense) AS totalExpense, SUM(duration) AS totalDuration " +
-				"FROM DB_ROUTE INNER JOIN DB_ENTRY ON DB_ROUTE.route_id = DB_ENTRY.route_id" +
-				"HAVING totalExpense <= " + averageCost + "AND totalDuration <= " + duration;
+		return "SELECT DB_ROUTE.route_id,SUM(expense), SUM(duration) " +
+				"FROM DB_ROUTE INNER JOIN DB_ENTRY ON DB_ROUTE.route_id = DB_ENTRY.route_id " +
+				"GROUP BY DB_ROUTE.route_id " +
+				"HAVING SUM(expense) <= '" + averageCost + "' AND SUM(duration) <= '" + duration + "'";
 	}
 
 	public boolean onResult(QueryResult result) throws SQLException {
-		while (result.getResultSet().next()) {
-			list.add(result.getResultSet().getString("route_id"));
+		ResultSet resultSet = result.getResultSet();
+		if(result.isSuccessfull()){
+			do{
+				list.add(resultSet.getString("route_id"));
+			}while(resultSet.next());
 		}
 		return false;
 	}
