@@ -6,6 +6,7 @@ import com.squadro.touricity.database.query.SelectionQuery;
 import com.squadro.touricity.database.result.QueryResult;
 import com.squadro.touricity.message.types.data.IPath;
 import com.squadro.touricity.message.types.data.Path;
+import com.squadro.touricity.message.types.data.enumeration.PathType;
 
 import javax.xml.crypto.Data;
 import java.sql.ResultSet;
@@ -25,7 +26,7 @@ public class PathListSelectionFromRouteId extends SelectionQuery {
 
 	@Override
 	public String getQuery() { //TODO: select Entry_id
-		return "SELECT DB_ENTRY.path_id,expense,duration,comment_desc,pointer,vertices FROM db_entry " +
+		return "SELECT DB_ENTRY.path_id,expense,duration,comment_desc,pointer,vertices,path_type FROM db_entry " +
 				"INNER JOIN DB_PATH ON DB_ENTRY.path_id = DB_PATH.path_id "+
 				"WHERE route_id = '" + route_id + "' AND DB_ENTRY.path_id IS NOT NULL ORDER BY pointer ASC";
 	}
@@ -44,6 +45,7 @@ public class PathListSelectionFromRouteId extends SelectionQuery {
 				path.setComment(rs.getString(Database.ENTRY_COMMENT_DESCRIPTION));
 				path.setIndex(rs.getInt(Database.ENTRY_POINTER));
 				path.setVertices(ByteArrays.Decoders.decodePathVertexArray(rs.getString(Database.PATH_VERTICES)));
+				path.setPath_type(PathType.values()[rs.getInt(Database.PATH_PATH_TYPE)]);
 
 				list.add(path);
 			} while (rs.next());
