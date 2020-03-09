@@ -236,7 +236,7 @@ public class Database {
 
 		HashSet<String> routeIds = new HashSet<String>(selectionFromCity.getList());
 		routeIds.retainAll(selectionFromCostAndDuration.getList());
-	//	routeIds.retainAll(selectionFromLike.getList());
+		routeIds.retainAll(selectionFromLike.getList());
 		routeIds.retainAll(selectionFromTransportation.getList());
 
 		List<String> routeIdList = new ArrayList<>(routeIds);
