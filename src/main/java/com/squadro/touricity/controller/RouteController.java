@@ -7,6 +7,8 @@ import com.squadro.touricity.message.types.data.Route;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.concurrent.CountDownLatch;
+
 @RestController
 public class RouteController {
 
