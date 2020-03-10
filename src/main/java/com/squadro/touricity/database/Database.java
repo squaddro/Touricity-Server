@@ -204,11 +204,23 @@ public class Database {
 		final String city_name = filter.getCity_name();
 		final int duration = filter.getDuration();
 		final int score = (int) filter.getScore();
-		final int path_type = filter.getPath_type();
+		int path_type = filter.getPath_type();
 
+		List<Integer> typeList = new ArrayList<>();
+ 		if(path_type >= 4){
+			typeList.add(PathType.BUS.getValue());
+			path_type -= 4;
+			if(path_type >= 2){
+				typeList.add(PathType.DRIVING.getValue());
+				path_type -= 2;
+				if(path_type >= 1){
+					typeList.add(PathType.WALKING.getValue());
+				}
+			}
+		}
 		RouteIdSelectionFromCity selectionFromCity = new RouteIdSelectionFromCity(city_name);
 		RouteIdSelectionFromCostAndDuration selectionFromCostAndDuration = new RouteIdSelectionFromCostAndDuration(expense, duration);
-		RouteIdSelectionFromTransportation selectionFromTransportation = new RouteIdSelectionFromTransportation(path_type);
+		RouteIdSelectionFromTransportation selectionFromTransportation = new RouteIdSelectionFromTransportation(typeList);
 //		RouteIdSelectionFromLike selectionFromLike = new RouteIdSelectionFromLike(score);
 
 		CountDownLatch countDownLatch = new CountDownLatch(3);
