@@ -28,6 +28,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
 import java.sql.*;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -208,20 +211,54 @@ public class Database {
 		RouteIdSelectionFromTransportation selectionFromTransportation = new RouteIdSelectionFromTransportation(path_type);
 		RouteIdSelectionFromLike selectionFromLike = new RouteIdSelectionFromLike(score);
 
-		selectionFromCity.execute();
-		selectionFromCostAndDuration.execute();
-		selectionFromLike.execute();
-		selectionFromTransportation.execute();
+		CountDownLatch countDownLatch = new CountDownLatch(4);
+		new Thread(() -> {
+			selectionFromCity.execute();
+			countDownLatch.countDown();
+		}).start();
+
+		new Thread(() -> {
+			selectionFromCostAndDuration.execute();
+			countDownLatch.countDown();
+		}).start();
+
+		new Thread(() -> {
+			selectionFromLike.execute();
+			countDownLatch.countDown();
+		}).start();
+
+		new Thread(() -> {
+			selectionFromTransportation.execute();
+			countDownLatch.countDown();
+		}).start();
+
+		try {
+			countDownLatch.await();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 
 		HashSet<String> routeIds = new HashSet<String>(selectionFromCity.getList());
 		routeIds.retainAll(selectionFromCostAndDuration.getList());
 		routeIds.retainAll(selectionFromLike.getList());
 		routeIds.retainAll(selectionFromTransportation.getList());
 
+		List<String> routeIdList = new ArrayList<>(routeIds);
 		List<Route> routeList = new ArrayList<>();
-		Iterator<String> iterator = routeIds.iterator();
-		while (iterator.hasNext()) {
-			routeList.add(getRouteInfo(iterator.next()));
+		CountDownLatch countDownLatch2 = new CountDownLatch(routeIds.size());
+
+		ExecutorService executor = Executors.newFixedThreadPool(16);
+		for(String s : routeIdList){
+			executor.execute(new Thread(() -> {
+				while(!checkConnection()){}
+				routeList.add(getRouteInfo(s));
+				countDownLatch2.countDown();
+			}));
+		}
+		try {
+			countDownLatch2.await();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 		return new FilterResult(routeList);
 	}
@@ -353,7 +390,6 @@ public class Database {
 
 		entries = combineSortedStopsAndPaths(stops, paths);
 		IEntry[] entriesArr = entries.toArray(new IEntry[entries.size()]);
-		
 		return new Route(creator.get(), id.get(), entriesArr, city_id.get(), title.get(), privacy.get());
 	}
 
