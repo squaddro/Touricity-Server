@@ -211,7 +211,7 @@ public class Database {
 		RouteIdSelectionFromTransportation selectionFromTransportation = new RouteIdSelectionFromTransportation(path_type);
 //		RouteIdSelectionFromLike selectionFromLike = new RouteIdSelectionFromLike(score);
 
-		CountDownLatch countDownLatch = new CountDownLatch(4);
+		CountDownLatch countDownLatch = new CountDownLatch(3);
 		new Thread(() -> {
 			selectionFromCity.execute();
 			countDownLatch.countDown();
