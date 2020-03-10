@@ -11,6 +11,7 @@ import com.squadro.touricity.database.query.locationQueries.GetLocationInfoQuery
 import com.squadro.touricity.database.query.locationQueries.InsertNewLocationQuery;
 import com.squadro.touricity.database.query.pipeline.IPipelinedQuery;
 import com.squadro.touricity.database.query.pipeline.PipelinedQuery;
+import com.squadro.touricity.database.query.userQueries.*;
 import com.squadro.touricity.database.query.routeQueries.*;
 import com.squadro.touricity.database.result.QueryResult;
 import com.squadro.touricity.message.types.IMessage;
@@ -18,6 +19,8 @@ import com.squadro.touricity.message.types.Status;
 import com.squadro.touricity.message.types.data.*;
 import com.squadro.touricity.message.types.data.enumeration.PathType;
 import com.squadro.touricity.message.types.data.enumeration.StatusCode;
+import com.squadro.touricity.session.CreateAccountQuery;
+import com.squadro.touricity.session.SessionCookie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicReferenceArray;
+
 
 public class Database {
 
@@ -252,6 +256,64 @@ public class Database {
 		GetLikeInfoQuery likeInfoQuery = new GetLikeInfoQuery(like_id);
 		likeInfoQuery.execute();
 		return likeInfoQuery.getLike();
+	}
+
+	public static IMessage signUp(String cookie,Credential userInfo){
+		SessionCheckQuery sessionCheckQuery = new SessionCheckQuery(cookie);
+		sessionCheckQuery.execute();
+		if(!sessionCheckQuery.isExists()){
+			return Status.build(StatusCode.SIGNUP_REJECT);
+		}
+
+		String account_id = sessionCheckQuery.getAccountId();
+		String user = userInfo.getUser_name();
+		String pass = userInfo.getPassword();
+
+		if(user == null || pass == null) {
+			return Status.build(StatusCode.SIGNUP_REJECT);
+		}
+
+		UserCheckQuery userCheckQuery = new UserCheckQuery(user);
+		userCheckQuery.execute();
+		if(userCheckQuery.getDoesUserExists()){
+			return Status.build(StatusCode.SIGNUP_REJECT_USERNAME);
+		}
+
+		String newAccoutId = UUID.randomUUID().toString();
+		CreateAccountQuery createAccountQuery = new CreateAccountQuery(newAccoutId);
+		createAccountQuery.execute();
+
+		CreateNewUserQuery createNewUserQuery = new CreateNewUserQuery(newAccoutId, user, pass);
+		createNewUserQuery.execute();
+
+		LoginPipeline loginPipeline = new LoginPipeline(cookie, user, pass);
+		Database.execute(loginPipeline);
+
+		return Status.build(StatusCode.SIGNUP_SUCCESSFUL);
+	}
+
+	public static IMessage signIn(String cookie,Credential userInfo){
+		String account_id = null;
+		String user = userInfo.getUser_name();
+		String pass = userInfo.getPassword();
+
+		if(user == null || pass == null) {
+			return Status.build(StatusCode.SIGNIN_REJECT);
+		}
+
+		LoginPipeline loginPipeline = new LoginPipeline(cookie, user, pass);
+		Database.execute(loginPipeline);
+		if(loginPipeline.isSuccessfull)
+			return Status.build(StatusCode.SIGNIN_SUCCESSFUL);
+		else
+			return Status.build(StatusCode.SIGNIN_REJECT);
+	}
+
+	public static IMessage signOut(String cookie,Credential userInfo){
+		SessionDeletionQuery sessionDeletionQuery = new SessionDeletionQuery(cookie);
+		sessionDeletionQuery.execute();
+
+		return Status.build(StatusCode.SIGNOUT_SUCCESSFULL);
 	}
 
 	public static Route insertRoute(Route route) {

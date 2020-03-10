@@ -1,5 +1,6 @@
 package com.squadro.touricity.session;
 
+import org.apache.catalina.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -9,6 +10,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.UUID;
 
 @Component
 public class RequestInterceptor extends HandlerInterceptorAdapter {
@@ -23,15 +25,20 @@ public class RequestInterceptor extends HandlerInterceptorAdapter {
         SessionCookie cookie = extractCookie(request.getCookies());
         logger.info("Received cookie: " + cookie);
 
-        if(cookie != null) {
-            AccountCheckQuery query = new AccountCheckQuery(cookie);
+
+        if(cookie == null) {
+            cookie = SessionCookie.random();
+            SessionCheckQuery query = new SessionCheckQuery(cookie);
             query.execute();
 
             if(!query.isExists()) {
+                String account_id = UUID.randomUUID().toString();
                 SessionCookie session = SessionCookie.random();
                 response.addCookie(new Cookie(SessionCookie.TAG, session.getUuid()));
-                CreateAccountQuery createQuery = new CreateAccountQuery(session);
+                CreateAccountQuery createQuery = new CreateAccountQuery(account_id);
                 createQuery.execute();
+                CreateSessionQuery createSessionQuery = new CreateSessionQuery(session,account_id);
+                createSessionQuery.execute();
             }
         }
 
