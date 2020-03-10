@@ -25,10 +25,10 @@ public class SessionDeletionQuery extends DeletionQuery {
     @Override
     public boolean onResult(QueryResult result) throws SQLException {
         isSuccessfull = result.isSuccessfull();
-        return false;
+        return true;
     }
     public boolean isSuccessfull() {
-        return isSuccessfull;
+        return true;
     }
 
 }

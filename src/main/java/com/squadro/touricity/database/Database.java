@@ -19,6 +19,8 @@ import com.squadro.touricity.message.types.Status;
 import com.squadro.touricity.message.types.data.*;
 import com.squadro.touricity.message.types.data.enumeration.PathType;
 import com.squadro.touricity.message.types.data.enumeration.StatusCode;
+import com.squadro.touricity.session.CreateAccountQuery;
+import com.squadro.touricity.session.SessionCookie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -277,8 +279,15 @@ public class Database {
 			return Status.build(StatusCode.SIGNUP_REJECT_USERNAME);
 		}
 
-		CreateNewUserQuery createNewUserQuery = new CreateNewUserQuery(account_id, user, pass);
+		String newAccoutId = UUID.randomUUID().toString();
+		CreateAccountQuery createAccountQuery = new CreateAccountQuery(newAccoutId);
+		createAccountQuery.execute();
+
+		CreateNewUserQuery createNewUserQuery = new CreateNewUserQuery(newAccoutId, user, pass);
 		createNewUserQuery.execute();
+
+		LoginPipeline loginPipeline = new LoginPipeline(cookie, user, pass);
+		Database.execute(loginPipeline);
 
 		return Status.build(StatusCode.SIGNUP_SUCCESSFUL);
 	}
@@ -292,33 +301,15 @@ public class Database {
 			return Status.build(StatusCode.SIGNIN_REJECT);
 		}
 
-		UserCheckQuery userCheckQuery = new UserCheckQuery(user);
-		userCheckQuery.execute();
-		if(!userCheckQuery.getDoesUserExists()){
+		LoginPipeline loginPipeline = new LoginPipeline(cookie, user, pass);
+		Database.execute(loginPipeline);
+		if(loginPipeline.isSuccessfull)
+			return Status.build(StatusCode.SIGNIN_SUCCESSFUL);
+		else
 			return Status.build(StatusCode.SIGNIN_REJECT);
-		}
-		if(!userCheckQuery.getUserPassword().equals(pass)){
-			return Status.build(StatusCode.SIGNIN_REJECT);
-		}
-		account_id = userCheckQuery.getAccountId();
-
-		SessionDeletionQuery sessionDeletionQuery = new SessionDeletionQuery(cookie);
-		sessionDeletionQuery.execute();
-
-		CreateSessionQuery createSessionQuery = new CreateSessionQuery(cookie, account_id);
-		createSessionQuery.execute();
-
-		return Status.build(StatusCode.SIGNIN_SUCCESSFUL);
 	}
 
 	public static IMessage signOut(String cookie,Credential userInfo){
-		String user = userInfo.getUser_name();
-		UserCheckQuery userCheckQuery = new UserCheckQuery(user);
-		userCheckQuery.execute();
-		if(!userCheckQuery.getDoesUserExists()){
-			return Status.build(StatusCode.SIGNOUT_REJECT);
-		}
-
 		SessionDeletionQuery sessionDeletionQuery = new SessionDeletionQuery(cookie);
 		sessionDeletionQuery.execute();
 
