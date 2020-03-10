@@ -209,7 +209,7 @@ public class Database {
 		RouteIdSelectionFromCity selectionFromCity = new RouteIdSelectionFromCity(city_name);
 		RouteIdSelectionFromCostAndDuration selectionFromCostAndDuration = new RouteIdSelectionFromCostAndDuration(expense, duration);
 		RouteIdSelectionFromTransportation selectionFromTransportation = new RouteIdSelectionFromTransportation(path_type);
-		RouteIdSelectionFromLike selectionFromLike = new RouteIdSelectionFromLike(score);
+//		RouteIdSelectionFromLike selectionFromLike = new RouteIdSelectionFromLike(score);
 
 		CountDownLatch countDownLatch = new CountDownLatch(4);
 		new Thread(() -> {
@@ -221,12 +221,12 @@ public class Database {
 			selectionFromCostAndDuration.execute();
 			countDownLatch.countDown();
 		}).start();
-
+/*
 		new Thread(() -> {
 			selectionFromLike.execute();
 			countDownLatch.countDown();
 		}).start();
-
+*/
 		new Thread(() -> {
 			selectionFromTransportation.execute();
 			countDownLatch.countDown();
@@ -240,7 +240,7 @@ public class Database {
 
 		HashSet<String> routeIds = new HashSet<String>(selectionFromCity.getList());
 		routeIds.retainAll(selectionFromCostAndDuration.getList());
-		routeIds.retainAll(selectionFromLike.getList());
+	//	routeIds.retainAll(selectionFromLike.getList());
 		routeIds.retainAll(selectionFromTransportation.getList());
 
 		List<String> routeIdList = new ArrayList<>(routeIds);
