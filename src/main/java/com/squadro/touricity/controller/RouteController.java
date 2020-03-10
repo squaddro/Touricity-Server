@@ -12,7 +12,7 @@ public class RouteController {
 
     @RequestMapping(
             value = "/route/info",
-            method = RequestMethod.POST,
+            method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
     )

@@ -6,6 +6,8 @@ public class Stop extends Entry implements IStop {
 
 	private String location_id;
 	private String stop_id;
+
+	private Location location;
 	
 	public Stop(){
 		
@@ -34,6 +36,14 @@ public class Stop extends Entry implements IStop {
 
 	public String getStop_id() {
 		return stop_id;
+	}
+
+	public Location getLocation() {
+		return location;
+	}
+
+	public void setLocation(Location location) {
+		this.location = location;
 	}
 
 	public void setLocation_id(String locationId) {

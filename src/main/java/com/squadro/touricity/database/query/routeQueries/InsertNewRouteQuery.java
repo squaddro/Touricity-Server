@@ -29,24 +29,17 @@ public class InsertNewRouteQuery extends InsertionQuery{
 
     @Override
     public String getQuery() {
+        DoesRouteExists doesRouteExists = new DoesRouteExists(route_id.get());
+        doesRouteExists.execute();
 
-        String query = null;
-        if(route_id.get() == null){
-            String newID = UUID.randomUUID().toString();
-            query = "INSERT INTO db_route(creator,route_id,city_id,title,route_desc,privacy) VALUES('" + creator + "','" + newID + "','" + city_id + "','" + title + "'," + "'desccc' ," + privacy + ")";
-            route_id.set(newID);
+        if(doesRouteExists.getDoesRouteExists()){
+            return "UPDATE db_route SET creator = '" + creator + "', route_id = '" + route_id.get() + "', city_id = '" + city_id + "', title = '" + title + "', route_desc = 'dummy desc', privacy =" + privacy;
         }
-
         else{
-            DoesRouteExists doesRouteExists = new DoesRouteExists(route_id.get());
-            doesRouteExists.execute();
-
-            if(doesRouteExists.getDoesRouteExists()){
-                query = "UPDATE db_route SET creator = '" + creator + "', route_id = '" + route_id.get() + "', city_id = '" + city_id + "', title = '" + title + "', route_desc = 'dummy desc', privacy =" + privacy;
-            }
+            String newID = UUID.randomUUID().toString();
+            route_id.set(newID);
+            return "INSERT INTO db_route(creator,route_id,city_id,title,route_desc,privacy) VALUES('" + creator + "','" + newID + "','" + city_id + "','" + title + "'," + "'desccc' ," + privacy + ")";
         }
-
-        return query;
     }
 
     @Override

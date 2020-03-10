@@ -222,16 +222,6 @@ public class Database {
 		return new FilterResult(routeList);
 	}
 
-	public static IMessage createLocation(Location location) {
-		InsertNewLocationQuery newLocationQuery = new InsertNewLocationQuery(location.getLongitude(), location.getLatitude());
-		newLocationQuery.execute();
-		if(newLocationQuery.isSuccessfull()){
-			return Status.build(StatusCode.INSERT_LOCATION_SUCCESSFULL);
-		}else{
-			return Status.build(StatusCode.INSERT_LOCATION_FAIL);
-		}
-	}
-
 	public static IMessage deleteRoute(RouteId routeId) {
 		DeleteRouteQuery deletingRouteQuery = new DeleteRouteQuery(routeId);
 		deletingRouteQuery.execute();
