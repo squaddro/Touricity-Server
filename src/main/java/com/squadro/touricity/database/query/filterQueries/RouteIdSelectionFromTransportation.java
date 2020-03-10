@@ -20,18 +20,21 @@ public class RouteIdSelectionFromTransportation extends SelectionQuery {
 
 	public String getQuery() {
 		int size = path_type.size();
-		int count = 0;
+
 		String base =  "SELECT DB_ROUTE.route_id " +
 				" FROM DB_ENTRY " +
 				" INNER JOIN DB_ROUTE ON DB_ENTRY.route_id = DB_ROUTE.route_id " +
 				" INNER JOIN DB_PATH ON DB_ENTRY.path_id = DB_PATH.path_id ";
-		while(size > 1){
-			String innerQuery = "WHERE DB_PATH.path_type = " + path_type.get(count) + "OR" ;
+		base = base.concat("WHERE DB_PATH.path_type = " + path_type.get(0));
+		size--;
+		int count = 2;
+		while(size > 0){
+			String innerQuery = "OR DB_PATH.path_type = " + path_type.get(path_type.size() - count)  ;
 			base = base.concat(innerQuery);
 			count++;
 			size--;
 		}
-		base = base.concat("WHERE DB_PATH.path_type = " + path_type.get(0));
+
 		return base;
 	}
 
