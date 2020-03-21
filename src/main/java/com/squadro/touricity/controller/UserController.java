@@ -1,61 +1,63 @@
 package com.squadro.touricity.controller;
 
 import com.squadro.touricity.database.Database;
-import com.squadro.touricity.message.types.data.RouteId;
 import com.squadro.touricity.message.types.IMessage;
-import com.squadro.touricity.message.types.data.Route;
+import com.squadro.touricity.message.types.data.Credential;
+import com.squadro.touricity.session.SessionCookie;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.concurrent.CountDownLatch;
+import javax.servlet.http.HttpServletResponse;
+
 
 @RestController
-public class RouteController {
+public class UserController {
 
     @RequestMapping(
-            value = "/route/info",
-            method = RequestMethod.GET,
+            value = "/signup",
+            method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
     @ResponseBody
-    public Route getRouteInfo(
-     @RequestBody RouteId route_id,
+    public IMessage signUp(
+     @RequestBody Credential credential,
      @CookieValue(value = "cookie_uuid", defaultValue = "notset") String cookie
     ){
-        Route route = null;
-        route = Database.getRouteInfo(route_id.getRoute_id());
-        return route;
+        IMessage msg = null;
+        msg = Database.signUp(cookie,credential);
+        return msg;
     }
 
     @RequestMapping(
-            value = "/route/delete",
+            value = "/signin",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
     @ResponseBody
-    public IMessage deleteRoute(
-            @RequestBody RouteId route_id,
+    public IMessage signIn(
+            @RequestBody Credential credential,
             @CookieValue(value = "cookie_uuid", defaultValue = "notset") String cookie
     ){
-        return Database.deleteRoute(route_id);
+        IMessage msg = null;
+        msg = Database.signIn(cookie,credential);
+        return msg;
     }
 
     @RequestMapping(
-            value = "/route/update",
+            value = "/signout",
             method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
     @ResponseBody
-    public Route updateRoute(
-            @RequestBody Route route,
+    public IMessage signOut(
+            @RequestBody Credential credential,
             @CookieValue(value = "cookie_uuid", defaultValue = "notset") String cookie
     ){
-        Route newRoute = null;
-        newRoute = Database.insertRoute(route);
-        return newRoute;
+        IMessage msg = null;
+        msg = Database.signOut(cookie,credential);
+        return msg;
     }
-
 }

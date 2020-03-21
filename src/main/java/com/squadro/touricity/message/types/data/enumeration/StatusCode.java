@@ -15,9 +15,7 @@ public enum StatusCode {
     INSERT_LOCATION_SUCCESSFULL(108,"New location successfully inserted!"),
     INSERT_LOCATION_FAIL(109,"New location insertion failed!"),
     DELETE_ROUTE_SUCCESSFULL(110,"Route is successfully deleted!"),
-    DELETE_ROUTE_FAIL(111,"Deleting route failed!"),
-    CITY_DOES_NOT_EXISTS(112, "City does not exists!"),
-    LOCATION_DOES_NOT_EXISTS(113, "Location does not exists!");
+    DELETE_ROUTE_FAIL(111,"Deleting route failed!");
 
     StatusCode(int status, String message) {
         this.status = status;
