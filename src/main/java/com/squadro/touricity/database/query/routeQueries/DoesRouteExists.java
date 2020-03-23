@@ -17,15 +17,15 @@ public class DoesRouteExists extends SelectionQuery {
 
     @Override
     public String getQuery() {
-        return "SELECT COUNT(*) FROM db_route WHERE route_id = '" + route_id + "' HAVING COUNT(*) > 0";
+        return "SELECT route_id FROM db_route WHERE route_id = '" + route_id + "'";
     }
 
     @Override
     public boolean onResult(QueryResult result) throws SQLException {
         if(result.isSuccessfull())
-            doesRouteExists = false;
-        else
             doesRouteExists = true;
+        else
+            doesRouteExists = false;
         return false;
     }
 
