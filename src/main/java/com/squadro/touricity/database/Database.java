@@ -4,15 +4,12 @@ import com.squadro.touricity.database.query.ISingleQuery;
 import com.squadro.touricity.database.query.SelectionQuery;
 import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromCity;
 import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromCostAndDuration;
-import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromLike;
 import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromTransportation;
 import com.squadro.touricity.database.query.likeQueries.GetLikeInfoQuery;
 import com.squadro.touricity.database.query.locationQueries.GetLocationInfoQuery;
-import com.squadro.touricity.database.query.locationQueries.InsertNewLocationQuery;
 import com.squadro.touricity.database.query.pipeline.IPipelinedQuery;
-import com.squadro.touricity.database.query.pipeline.PipelinedQuery;
-import com.squadro.touricity.database.query.userQueries.*;
 import com.squadro.touricity.database.query.routeQueries.*;
+import com.squadro.touricity.database.query.userQueries.*;
 import com.squadro.touricity.database.result.QueryResult;
 import com.squadro.touricity.message.types.IMessage;
 import com.squadro.touricity.message.types.Status;
@@ -20,12 +17,9 @@ import com.squadro.touricity.message.types.data.*;
 import com.squadro.touricity.message.types.data.enumeration.PathType;
 import com.squadro.touricity.message.types.data.enumeration.StatusCode;
 import com.squadro.touricity.session.CreateAccountQuery;
-import com.squadro.touricity.session.SessionCookie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
-import java.io.ObjectInputStream;
 import java.sql.*;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -34,7 +28,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.atomic.AtomicReferenceArray;
 
 
 public class Database {
@@ -207,17 +200,19 @@ public class Database {
 		int path_type = filter.getPath_type();
 
 		List<Integer> typeList = new ArrayList<>();
- 		if(path_type >= 4){
+		if (path_type >= 4) {
 			typeList.add(PathType.BUS.getValue());
 			path_type -= 4;
-			if(path_type >= 2){
-				typeList.add(PathType.DRIVING.getValue());
-				path_type -= 2;
-				if(path_type >= 1){
-					typeList.add(PathType.WALKING.getValue());
-				}
-			}
 		}
+		if (path_type >= 2) {
+			typeList.add(PathType.DRIVING.getValue());
+			path_type -= 2;
+		}
+		if (path_type >= 1) {
+			typeList.add(PathType.WALKING.getValue());
+		}
+
+
 		RouteIdSelectionFromCity selectionFromCity = new RouteIdSelectionFromCity(city_name);
 		RouteIdSelectionFromCostAndDuration selectionFromCostAndDuration = new RouteIdSelectionFromCostAndDuration(expense, duration);
 		RouteIdSelectionFromTransportation selectionFromTransportation = new RouteIdSelectionFromTransportation(typeList);
@@ -252,7 +247,7 @@ public class Database {
 
 		HashSet<String> routeIds = new HashSet<String>(selectionFromCity.getList());
 		routeIds.retainAll(selectionFromCostAndDuration.getList());
-	//	routeIds.retainAll(selectionFromLike.getList());
+		//	routeIds.retainAll(selectionFromLike.getList());
 		routeIds.retainAll(selectionFromTransportation.getList());
 
 		List<String> routeIdList = new ArrayList<>(routeIds);
@@ -260,9 +255,10 @@ public class Database {
 		CountDownLatch countDownLatch2 = new CountDownLatch(routeIds.size());
 
 		ExecutorService executor = Executors.newFixedThreadPool(16);
-		for(String s : routeIdList){
+		for (String s : routeIdList) {
 			executor.execute(new Thread(() -> {
-				while(!checkConnection()){}
+				while (!checkConnection()) {
+				}
 				routeList.add(getRouteInfo(s));
 				countDownLatch2.countDown();
 			}));
@@ -275,42 +271,31 @@ public class Database {
 		return new FilterResult(routeList);
 	}
 
-	public static IMessage createLocation(Location location) {
-		InsertNewLocationQuery newLocationQuery = new InsertNewLocationQuery(location.getLongitude(), location.getLatitude());
-		newLocationQuery.execute();
-		if(newLocationQuery.isSuccessfull()){
-			return Status.build(StatusCode.INSERT_LOCATION_SUCCESSFULL);
-		}else{
-			return Status.build(StatusCode.INSERT_LOCATION_FAIL);
-		}
-	}
-
 	public static IMessage deleteRoute(RouteId routeId) {
 		DeleteRouteQuery deletingRouteQuery = new DeleteRouteQuery(routeId);
 		deletingRouteQuery.execute();
-		if(deletingRouteQuery.isSuccessfull()) {
+		if (deletingRouteQuery.isSuccessfull()) {
 			return Status.build(StatusCode.DELETE_ROUTE_SUCCESSFULL);
-		}
-		else
+		} else
 			return Status.build(StatusCode.DELETE_ROUTE_FAIL);
 	}
 
-	public static Location getLocationInfo(String location_id){
+	public static Location getLocationInfo(String location_id) {
 		GetLocationInfoQuery locationInfoQuery = new GetLocationInfoQuery(location_id);
 		locationInfoQuery.execute();
 		return locationInfoQuery.getLocation();
 	}
 
-	public static Like getLikeInfo(String like_id){
+	public static Like getLikeInfo(String like_id) {
 		GetLikeInfoQuery likeInfoQuery = new GetLikeInfoQuery(like_id);
 		likeInfoQuery.execute();
 		return likeInfoQuery.getLike();
 	}
 
-	public static IMessage signUp(String cookie,Credential userInfo){
+	public static IMessage signUp(String cookie, Credential userInfo) {
 		SessionCheckQuery sessionCheckQuery = new SessionCheckQuery(cookie);
 		sessionCheckQuery.execute();
-		if(!sessionCheckQuery.isExists()){
+		if (!sessionCheckQuery.isExists()) {
 			return Status.build(StatusCode.SIGNUP_REJECT);
 		}
 
@@ -318,13 +303,13 @@ public class Database {
 		String user = userInfo.getUser_name();
 		String pass = userInfo.getPassword();
 
-		if(user == null || pass == null) {
+		if (user == null || pass == null) {
 			return Status.build(StatusCode.SIGNUP_REJECT);
 		}
 
 		UserCheckQuery userCheckQuery = new UserCheckQuery(user);
 		userCheckQuery.execute();
-		if(userCheckQuery.getDoesUserExists()){
+		if (userCheckQuery.getDoesUserExists()) {
 			return Status.build(StatusCode.SIGNUP_REJECT_USERNAME);
 		}
 
@@ -341,24 +326,24 @@ public class Database {
 		return Status.build(StatusCode.SIGNUP_SUCCESSFUL);
 	}
 
-	public static IMessage signIn(String cookie,Credential userInfo){
+	public static IMessage signIn(String cookie, Credential userInfo) {
 		String account_id = null;
 		String user = userInfo.getUser_name();
 		String pass = userInfo.getPassword();
 
-		if(user == null || pass == null) {
+		if (user == null || pass == null) {
 			return Status.build(StatusCode.SIGNIN_REJECT);
 		}
 
 		LoginPipeline loginPipeline = new LoginPipeline(cookie, user, pass);
 		Database.execute(loginPipeline);
-		if(loginPipeline.isSuccessfull)
+		if (loginPipeline.isSuccessfull)
 			return Status.build(StatusCode.SIGNIN_SUCCESSFUL);
 		else
 			return Status.build(StatusCode.SIGNIN_REJECT);
 	}
 
-	public static IMessage signOut(String cookie,Credential userInfo){
+	public static IMessage signOut(String cookie, Credential userInfo) {
 		SessionDeletionQuery sessionDeletionQuery = new SessionDeletionQuery(cookie);
 		sessionDeletionQuery.execute();
 
@@ -372,7 +357,7 @@ public class Database {
 		return insertNewRouteQuery.getRoute();
 	}
 
-	public static Route getRouteInfo(String route_id){
+	public static Route getRouteInfo(String route_id) {
 
 		final AtomicReference<String> id = new AtomicReference<>(route_id);
 		final AtomicReference<String> creator = new AtomicReference<String>();
@@ -408,8 +393,8 @@ public class Database {
 	private static List<IEntry> combineSortedStopsAndPaths(List<IEntry> stops, List<IEntry> paths) {
 		List<IEntry> entries = new ArrayList<>();
 
-		if(stops.size() > 0 && stops.get(0).getIndex() == 0){
-			for(int i=0; i < stops.size() + paths.size() ; i++){
+		if (stops.size() > 0 && stops.get(0).getIndex() == 0) {
+			for (int i = 0; i < stops.size() + paths.size(); i++) {
 				int j = 0; //counter for stops.
 				int k = 0; //counter for paths.
 				if (i % 2 == 0) {
@@ -420,9 +405,8 @@ public class Database {
 					k++;
 				}
 			}
-		}
-		else if (paths.size() > 0 && paths.get(0).getIndex() == 0) {
-			for (int i = 0; i < stops.size() + paths.size() ; i++) {
+		} else if (paths.size() > 0 && paths.get(0).getIndex() == 0) {
+			for (int i = 0; i < stops.size() + paths.size(); i++) {
 				int j = 0; //counter for paths.
 				int k = 0; //counter for stops.
 				if (i % 2 == 0) {
@@ -433,8 +417,7 @@ public class Database {
 					k++;
 				}
 			}
-		}
-		else
+		} else
 			entries = null;
 
 		return entries;

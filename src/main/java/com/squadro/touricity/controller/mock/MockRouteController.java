@@ -1,10 +1,7 @@
 package com.squadro.touricity.controller.mock;
 
 import com.squadro.touricity.message.types.IMessage;
-import com.squadro.touricity.message.types.data.IEntry;
-import com.squadro.touricity.message.types.data.Path;
-import com.squadro.touricity.message.types.data.Route;
-import com.squadro.touricity.message.types.data.Stop;
+import com.squadro.touricity.message.types.data.*;
 import com.squadro.touricity.message.types.data.enumeration.PathType;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,9 +23,9 @@ public class MockRouteController {
         if (random.equals("false")) {
             creator = "4c0ac9c5-ecf7-bf57-ce21-175587e8d8b6";
             routeId = "c08ac5c2-5b9f-6a8f-35bf-448917e7d8e9";
-            stop1 = new Stop("5c0ca3bb-638d-41ef-8e36-53a5b113d044", "c09fc4c0-863e-4ce7-bf35-37e5b113d044", 3, 360, "Very nice place!");
-            stop2 = new Stop("4afb71ea-863e-e8e6-75a4-37e5b113d044", "82ed63bc-cee5-4ce7-cab7-448917e7d8e9", 2, 360, "Very nice place!");
-            stop3 = new Stop("82ed63bc-d12s-cab7-21f1-785be113d044", "c09fc4c0-638d-e8e6-bf35-53a5b113d044", 3, 360, "Very nice place!");
+            stop1 = new Stop(new Location(), "c09fc4c0-863e-4ce7-bf35-37e5b113d044", 3, 360, "Very nice place!");
+            stop2 = new Stop(new Location(), "82ed63bc-cee5-4ce7-cab7-448917e7d8e9", 2, 360, "Very nice place!");
+            stop3 = new Stop(new Location(), "c09fc4c0-638d-e8e6-bf35-53a5b113d044", 3, 360, "Very nice place!");
             v1 = new Path.PathVertex(39.936 ,32.860);
             v2 = new Path.PathVertex(39.938,32.862);
             v3 = new Path.PathVertex(39.940,32.864);
@@ -41,9 +38,9 @@ public class MockRouteController {
         } else if (random.equals("true")) {
             creator = MockRandomGenerator.randomAlphaNumericGenerator(36);
             routeId = MockRandomGenerator.randomAlphaNumericGenerator(36);
-            stop1 = new Stop(MockRandomGenerator.randomAlphaNumericGenerator(36), MockRandomGenerator.randomAlphaNumericGenerator(36), MockRandomGenerator.randomIntGenerator(5), MockRandomGenerator.randomIntGenerator(360), MockRandomGenerator.randomAlphaNumericGenerator(1000));
-            stop2 = new Stop(MockRandomGenerator.randomAlphaNumericGenerator(36), MockRandomGenerator.randomAlphaNumericGenerator(36), MockRandomGenerator.randomIntGenerator(5), MockRandomGenerator.randomIntGenerator(360), MockRandomGenerator.randomAlphaNumericGenerator(1000));
-            stop3 = new Stop(MockRandomGenerator.randomAlphaNumericGenerator(36), MockRandomGenerator.randomAlphaNumericGenerator(36), MockRandomGenerator.randomIntGenerator(5), MockRandomGenerator.randomIntGenerator(360), MockRandomGenerator.randomAlphaNumericGenerator(1000));
+            stop1 = new Stop(new Location(), MockRandomGenerator.randomAlphaNumericGenerator(36), MockRandomGenerator.randomIntGenerator(5), MockRandomGenerator.randomIntGenerator(360), MockRandomGenerator.randomAlphaNumericGenerator(1000));
+            stop2 = new Stop(new Location(), MockRandomGenerator.randomAlphaNumericGenerator(36), MockRandomGenerator.randomIntGenerator(5), MockRandomGenerator.randomIntGenerator(360), MockRandomGenerator.randomAlphaNumericGenerator(1000));
+            stop3 = new Stop(new Location(), MockRandomGenerator.randomAlphaNumericGenerator(36), MockRandomGenerator.randomIntGenerator(5), MockRandomGenerator.randomIntGenerator(360), MockRandomGenerator.randomAlphaNumericGenerator(1000));
             v1 = new Path.PathVertex(MockRandomGenerator.randomDoubleGenerator(35,40), MockRandomGenerator.randomDoubleGenerator(30,35));
             v2 = new Path.PathVertex(MockRandomGenerator.randomDoubleGenerator(35,40), MockRandomGenerator.randomDoubleGenerator(30,35));
             v3 = new Path.PathVertex(MockRandomGenerator.randomDoubleGenerator(35,40), MockRandomGenerator.randomDoubleGenerator(30,35));

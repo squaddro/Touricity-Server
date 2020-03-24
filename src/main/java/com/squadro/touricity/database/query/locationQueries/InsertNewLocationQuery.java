@@ -1,36 +1,88 @@
 package com.squadro.touricity.database.query.locationQueries;
 
+import com.squadro.touricity.database.Database;
+import com.squadro.touricity.database.query.ISingleQuery;
 import com.squadro.touricity.database.query.InsertionQuery;
+import com.squadro.touricity.database.query.SelectionQuery;
+import com.squadro.touricity.database.query.pipeline.PipelinedQuery;
 import com.squadro.touricity.database.result.QueryResult;
+import com.squadro.touricity.message.types.data.Location;
 
 import java.sql.SQLException;
-import java.util.UUID;
+import java.util.Queue;
 
-public class InsertNewLocationQuery extends InsertionQuery {
+public class InsertNewLocationQuery extends PipelinedQuery {
 
-	private final double longitude;
-	private final double latitude;
-	private boolean isSuccessfull;
+	private Location location;
 
-	public InsertNewLocationQuery(double longitude, double latitude) {
-		this.longitude = longitude;
-		this.latitude = latitude;
-		isSuccessfull = false;
+	private boolean isSuccessful = false;
+	private boolean locationExists = false;
+	private boolean cityExists = false;
+
+	public InsertNewLocationQuery(Location location) {
+		this.location = location;
+	}
+
+	public boolean isSuccessful() {
+		return isSuccessful;
+	}
+
+	public boolean isLocationExists() {
+		return locationExists;
+	}
+
+	public boolean isCityExists() {
+		return cityExists;
 	}
 
 	@Override
-	public String getQuery() {
-		String location_id = UUID.randomUUID().toString();
-		return "INSERT INTO DB_LOCATION VALUES('" + location_id + "',NULL," + latitude + "," + longitude + ")";
-	}
+	protected void PrepareQueue(Queue<ISingleQuery> queue) {
+		queue.add(new SelectionQuery() {
+			@Override
+			public String getQuery() {
+				return "SELECT * FROM " + Database.LOCATION + " WHERE " + Database.LOCATION_LOCATION_ID + " LIKE " + Database.value(location.getLocation_id());
+			}
 
-	@Override
-	public boolean onResult(QueryResult result) throws SQLException {
-		isSuccessfull = result.isSuccessfull();
-		return false;
-	}
+			@Override
+			public boolean onResult(QueryResult result) throws SQLException {
+				locationExists = result.isSuccessfull();
+				return !result.isSuccessfull();
+			}
+		});
 
-	public boolean isSuccessfull() {
-		return isSuccessfull;
+		queue.add(new SelectionQuery() {
+			@Override
+			public String getQuery() {
+				return "SELECT * FROM " + Database.CITY + " WHERE " + Database.CITY_CITY_ID + " LIKE " + Database.value(location.getCity_id());
+			}
+
+			@Override
+			public boolean onResult(QueryResult result) throws SQLException {
+				cityExists = result.isSuccessfull();
+				return result.isSuccessfull();
+			}
+		});
+
+		queue.add(new InsertionQuery() {
+			@Override
+			public String getQuery() {
+				return "INSERT INTO " + Database.LOCATION + "(" +
+						Database.LOCATION_LOCATION_ID + "," +
+						Database.LOCATION_CITY_ID + "," +
+						Database.LOCATION_LATITUDE + "," +
+						Database.LOCATION_LONGITUDE + ") " +
+						"VALUES(" +
+						Database.value(location.getLocation_id()) + "," +
+						Database.value(location.getCity_id()) + "," +
+						location.getLatitude() + "," +
+						location.getLongitude() + ")";
+			}
+
+			@Override
+			public boolean onResult(QueryResult result) throws SQLException {
+				isSuccessful = result.isSuccessfull();
+				return result.isSuccessfull();
+			}
+		});
 	}
 }

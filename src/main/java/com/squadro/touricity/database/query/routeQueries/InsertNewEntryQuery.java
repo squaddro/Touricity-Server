@@ -1,7 +1,9 @@
 package com.squadro.touricity.database.query.routeQueries;
 
 import com.squadro.touricity.database.ByteArrays;
+import com.squadro.touricity.database.Database;
 import com.squadro.touricity.database.query.InsertionQuery;
+import com.squadro.touricity.database.query.locationQueries.InsertNewLocationQuery;
 import com.squadro.touricity.database.result.QueryResult;
 import com.squadro.touricity.message.types.data.IEntry;
 import com.squadro.touricity.message.types.data.IPath;
@@ -26,7 +28,7 @@ public class InsertNewEntryQuery extends InsertionQuery {
         this.pointer = pointer;
         if(entry instanceof Stop){
             if(((Stop) entry).getStop_id() == null){
-                Stop stop = new Stop(((Stop) entry).getLocation_id(), null, entry.getExpense(), entry.getDuration(), entry.getComment(), entry.getIndex());
+                Stop stop = new Stop(((Stop) entry).getLocation(), null, entry.getExpense(), entry.getDuration(), entry.getComment(), entry.getIndex());
                 this.entry.set(stop);
                 isStop = true;
             }
@@ -35,7 +37,7 @@ public class InsertNewEntryQuery extends InsertionQuery {
                 doesStopExists.execute();
 
                 if(doesStopExists.getDoesStopExists()){
-                    Stop stop = new Stop(((Stop) entry).getLocation_id(), ((Stop) entry).getStop_id(), entry.getExpense(), entry.getDuration(), entry.getComment(), entry.getIndex());
+                    Stop stop = new Stop(((Stop) entry).getLocation(), ((Stop) entry).getStop_id(), entry.getExpense(), entry.getDuration(), entry.getComment(), entry.getIndex());
                     this.entry.set(stop);
                     isStop = true;
                 }
@@ -73,9 +75,11 @@ public class InsertNewEntryQuery extends InsertionQuery {
             if(stop.getStop_id() == null){
                 String newUUID = UUID.randomUUID().toString();
                 ((Stop) this.entry.get()).setStop_id(newUUID);
+                InsertNewLocationQuery locationQuery = new InsertNewLocationQuery(stop.getLocation());
+                Database.execute(locationQuery);
                 entryQuery = "INSERT INTO db_entry(route_id,stop_id,path_id,entry_id,expense,duration,comment_desc,pointer) VALUES(" +"'"+ route_id + "','" + newUUID + "'," + "NULL" + ",'"
                         + UUID.randomUUID().toString() + "'," + stop.getExpense() + "," + stop.getDuration() + ",'" + stop.getComment() + "'," + pointer+ ")";
-                return "INSERT INTO db_stop(location_id, stop_id) VALUES(" + "'" + stop.getLocation_id() + "','" + newUUID + "')";
+                return "INSERT INTO db_stop(location_id, stop_id) VALUES(" + "'" + stop.getLocation().getLocation_id() + "','" + newUUID + "')";
             }
             else{
                 DoesStopExists doesStopExists = new DoesStopExists(((Stop) entry.get()).getStop_id());

@@ -10,11 +10,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class GetLocationInfoQuery extends SelectionQuery {
 
-	final AtomicReference<String> city_id = new AtomicReference<>();
-	final AtomicReference<Double> latitude = new AtomicReference<>();
-	final AtomicReference<Double> longitude = new AtomicReference<>();
+	private String city_id = null;
+	double latitude = 0;
+	double longitude = 0;
 	private final String location_id;
-
 
 	public GetLocationInfoQuery(String location_id) {
 		this.location_id = location_id;
@@ -28,14 +27,15 @@ public class GetLocationInfoQuery extends SelectionQuery {
 	@Override
 	public boolean onResult(QueryResult result) throws SQLException {
 		if(result.isSuccessfull()){
-			city_id.set(result.getResultSet().getString("city_id"));
-			latitude.set(result.getResultSet().getDouble("latitude"));
-			longitude.set(result.getResultSet().getDouble("longitude"));		}
+			city_id = result.getResultSet().getString("city_id");
+			latitude = result.getResultSet().getDouble("latitude");
+			longitude = result.getResultSet().getDouble("longitude");
+		}
 		return false;
 	}
 
 	public Location getLocation(){
-		Location location = new Location(location_id, city_id.get(), latitude.get(), longitude.get());
+		Location location = new Location(location_id, city_id, latitude, longitude);
 		return location;
 	}
 }

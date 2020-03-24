@@ -1,8 +1,5 @@
 package com.squadro.touricity.message.types.data;
 
-
-import com.squadro.touricity.message.types.IMessage;
-
 public class Location implements ILocation {
 
 	private String location_id;

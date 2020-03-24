@@ -1,6 +1,7 @@
 package com.squadro.touricity.controller.mock;
 
 import com.squadro.touricity.message.types.IMessage;
+import com.squadro.touricity.message.types.data.Location;
 import com.squadro.touricity.message.types.data.Stop;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,6 @@ public class MockStopController {
             duration = MockRandomGenerator.randomIntGenerator(360);
             comment = MockRandomGenerator.randomAlphaNumericGenerator(1000);
         }
-        return new Stop(locationId, stopId, expense, duration, comment);
+        return new Stop(new Location(), stopId, expense, duration, comment);
     }
 }
