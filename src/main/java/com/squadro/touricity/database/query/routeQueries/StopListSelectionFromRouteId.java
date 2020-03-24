@@ -45,10 +45,8 @@ public class StopListSelectionFromRouteId extends SelectionQuery {
 				stop.setDuration(rs.getInt("duration"));
 				stop.setComment(rs.getString("comment_desc"));
 				stop.setIndex(rs.getInt("pointer"));
-				stop.setLocation((Location)rs.getObject("location"));
 
-				AtomicReference<Location> location = new AtomicReference<Location>();
-				GetLocationInfoQuery locationInfoQuery = new GetLocationInfoQuery(stop.getLocation().getLocation_id());
+				GetLocationInfoQuery locationInfoQuery = new GetLocationInfoQuery(rs.getString("location_id"));
 				locationInfoQuery.execute();
 				stop.setLocation(locationInfoQuery.getLocation());
 
