@@ -57,7 +57,7 @@ CREATE TABLE DB_STOP (
 );
 
 CREATE TABLE DB_LOCATION (
-       Location_Id char(36),
+       Location_Id varchar(36),
        City_Id char(36),
        Latitude double precision,
        Longitude double precision
