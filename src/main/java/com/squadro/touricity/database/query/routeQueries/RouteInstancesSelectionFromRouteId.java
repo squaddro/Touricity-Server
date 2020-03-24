@@ -26,7 +26,7 @@ public class RouteInstancesSelectionFromRouteId extends SelectionQuery {
 		Route resultRoute = new Route();
 		ResultSet resultSet = result.getResultSet();
 		if(result.isSuccessfull()){
-			resultRoute.setCity_id(resultSet.getString("city_id"));
+			resultRoute.setCity_id("111111111111111111111111111111111111");
 			resultRoute.setTitle(resultSet.getString("title"));
 			resultRoute.setCreator(resultSet.getString("creator"));
 			resultRoute.setPrivacy(resultSet.getInt("privacy"));
