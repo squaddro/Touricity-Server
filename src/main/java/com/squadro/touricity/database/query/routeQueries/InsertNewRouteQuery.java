@@ -22,7 +22,7 @@ public class InsertNewRouteQuery extends InsertionQuery{
         this.route_id.set(route_id);
         this.creator = creator;
         this.entries = entries;
-        this.city_id = city_id;
+        this.city_id = "111111111111111111111111111111111111";
         this.title = title;
         this.privacy = privacy;
     }
