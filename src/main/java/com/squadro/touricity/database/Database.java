@@ -393,10 +393,10 @@ public class Database {
 	private static List<IEntry> combineSortedStopsAndPaths(List<IEntry> stops, List<IEntry> paths) {
 		List<IEntry> entries = new ArrayList<>();
 
+		int j = 0; //counter for stops.
+		int k = 0; //counter for paths.
 		if (stops.size() > 0 && stops.get(0).getIndex() == 0) {
 			for (int i = 0; i < stops.size() + paths.size(); i++) {
-				int j = 0; //counter for stops.
-				int k = 0; //counter for paths.
 				if (i % 2 == 0) {
 					entries.add(stops.get(j));
 					j++;
@@ -407,8 +407,6 @@ public class Database {
 			}
 		} else if (paths.size() > 0 && paths.get(0).getIndex() == 0) {
 			for (int i = 0; i < stops.size() + paths.size(); i++) {
-				int j = 0; //counter for paths.
-				int k = 0; //counter for stops.
 				if (i % 2 == 0) {
 					entries.add(paths.get(j));
 					j++;
