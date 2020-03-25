@@ -29,7 +29,7 @@ public class RouteIdSelectionFromTransportation extends SelectionQuery {
 		size--;
 		int count = 2;
 		while(size > 0){
-			String innerQuery = "OR DB_PATH.path_type = " + path_type.get(path_type.size() - count)  ;
+			String innerQuery = " OR DB_PATH.path_type = " + path_type.get(path_type.size() - count)  ;
 			base = base.concat(innerQuery);
 			count++;
 			size--;
