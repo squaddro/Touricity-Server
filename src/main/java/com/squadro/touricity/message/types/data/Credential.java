@@ -3,15 +3,15 @@ package com.squadro.touricity.message.types.data;
 public class Credential {
 
 	private String user_name;
-	private String password;
+	private String token;
 
 	public Credential() {
 		// nothing
 	}
 
-	public Credential(String user_name, String password) {
+	public Credential(String user_name, String token) {
 		this.user_name = user_name;
-		this.password = password;
+		this.token = token;
 	}
 
 	public String getUser_name() {
@@ -22,11 +22,11 @@ public class Credential {
 		this.user_name = user_name;
 	}
 
-	public String getPassword() {
-		return password;
+	public String getToken() {
+		return token;
 	}
 
-	public void setPassword() {
-		this.password = password;
+	public void setToken() {
+		this.token = token;
 	}
 }

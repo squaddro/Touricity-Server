@@ -293,17 +293,10 @@ public class Database {
 	}
 
 	public static IMessage signUp(String cookie, Credential userInfo) {
-		SessionCheckQuery sessionCheckQuery = new SessionCheckQuery(cookie);
-		sessionCheckQuery.execute();
-		if (!sessionCheckQuery.isExists()) {
-			return Status.build(StatusCode.SIGNUP_REJECT);
-		}
-
-		String account_id = sessionCheckQuery.getAccountId();
 		String user = userInfo.getUser_name();
-		String pass = userInfo.getPassword();
+		String token = userInfo.getToken();
 
-		if (user == null || pass == null) {
+		if (user == null || token == null) {
 			return Status.build(StatusCode.SIGNUP_REJECT);
 		}
 
@@ -317,11 +310,11 @@ public class Database {
 		CreateAccountQuery createAccountQuery = new CreateAccountQuery(newAccoutId);
 		createAccountQuery.execute();
 
-		CreateNewUserQuery createNewUserQuery = new CreateNewUserQuery(newAccoutId, user, pass);
+		CreateNewUserQuery createNewUserQuery = new CreateNewUserQuery(newAccoutId, user, token);
 		createNewUserQuery.execute();
 
-		LoginPipeline loginPipeline = new LoginPipeline(cookie, user, pass);
-		Database.execute(loginPipeline);
+		/*LoginPipeline loginPipeline = new LoginPipeline(cookie, user, token);
+		Database.execute(loginPipeline);*/
 
 		return Status.build(StatusCode.SIGNUP_SUCCESSFUL);
 	}
@@ -329,15 +322,15 @@ public class Database {
 	public static IMessage signIn(String cookie, Credential userInfo) {
 		String account_id = null;
 		String user = userInfo.getUser_name();
-		String pass = userInfo.getPassword();
+		String token = userInfo.getToken();
 
-		if (user == null || pass == null) {
+		if (user == null || token == null) {
 			return Status.build(StatusCode.SIGNIN_REJECT);
 		}
 
-		LoginPipeline loginPipeline = new LoginPipeline(cookie, user, pass);
-		Database.execute(loginPipeline);
-		if (loginPipeline.isSuccessfull)
+		LoginQuery loginQuery = new LoginQuery(user, token);
+		Database.execute(loginQuery);
+		if (loginQuery.isSuccesfull)
 			return Status.build(StatusCode.SIGNIN_SUCCESSFUL);
 		else
 			return Status.build(StatusCode.SIGNIN_REJECT);
