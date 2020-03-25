@@ -48,16 +48,16 @@ CREATE TABLE DB_ENTRY (
 CREATE TABLE DB_PATH (
        Path_Id char(36),
        Path_Type integer,
-       Vertices varchar(5000)
+       Vertices text
 );
- 
+
 CREATE TABLE DB_STOP (
        Location_Id char(36),
        Stop_Id char(36)
 );
 
 CREATE TABLE DB_LOCATION (
-       Location_Id varchar(36),
+       Location_Id text,
        City_Id char(36),
        Latitude double precision,
        Longitude double precision
