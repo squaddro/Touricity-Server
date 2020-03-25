@@ -52,7 +52,7 @@ CREATE TABLE DB_PATH (
 );
 
 CREATE TABLE DB_STOP (
-       Location_Id char(36),
+       Location_Id text,
        Stop_Id char(36)
 );
 
@@ -81,12 +81,12 @@ CREATE TABLE DB_CITY (
 );
 
 CREATE TABLE DB_LOCATION_LIKE (
-       Location_Id char(36),
+       Location_Id text,
        Like_Id char(36)
 );
 
 CREATE TABLE DB_LOCATION_COMMENT (
-       Location_Id char(36),
+       Location_Id text,
        Comment_Id char(36)
 );
 

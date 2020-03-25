@@ -31,8 +31,6 @@ public class LocationController {
 
 		if(locationQuery.isSuccessful())
 			return Status.build(StatusCode.INSERT_LOCATION_SUCCESSFULL);
-		else if(!locationQuery.isCityExists())
-			return Status.build(StatusCode.CITY_DOES_NOT_EXISTS);
 		else if(!locationQuery.isLocationExists())
 			return Status.build(StatusCode.LOCATION_DOES_NOT_EXISTS);
 		else
