@@ -17,7 +17,6 @@ public class InsertNewLocationQuery extends PipelinedQuery {
 
 	private boolean isSuccessful = false;
 	private boolean locationExists = false;
-	private boolean cityExists = false;
 
 	public InsertNewLocationQuery(Location location) {
 		this.location = location;
@@ -29,10 +28,6 @@ public class InsertNewLocationQuery extends PipelinedQuery {
 
 	public boolean isLocationExists() {
 		return locationExists;
-	}
-
-	public boolean isCityExists() {
-		return cityExists;
 	}
 
 	@Override
@@ -47,19 +42,6 @@ public class InsertNewLocationQuery extends PipelinedQuery {
 			public boolean onResult(QueryResult result) throws SQLException {
 				locationExists = result.isSuccessfull();
 				return !result.isSuccessfull();
-			}
-		});
-
-		queue.add(new SelectionQuery() {
-			@Override
-			public String getQuery() {
-				return "SELECT * FROM " + Database.CITY + " WHERE " + Database.CITY_CITY_ID + " LIKE " + Database.value(location.getCity_id());
-			}
-
-			@Override
-			public boolean onResult(QueryResult result) throws SQLException {
-				cityExists = result.isSuccessfull();
-				return result.isSuccessfull();
 			}
 		});
 
