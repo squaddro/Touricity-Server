@@ -17,7 +17,7 @@ CREATE TABLE DB_ACCOUNT (
 CREATE TABLE DB_USER (
        Account_Id char(36),
        Username varchar(20),
-       User_Password varchar(20)
+       User_Password varchar(200)
 );
 
 CREATE TABLE DB_SESSION (
