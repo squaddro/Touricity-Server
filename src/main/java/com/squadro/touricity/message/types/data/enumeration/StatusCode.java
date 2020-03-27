@@ -17,7 +17,9 @@ public enum StatusCode {
     DELETE_ROUTE_SUCCESSFULL(110,"Route is successfully deleted!"),
     DELETE_ROUTE_FAIL(111,"Deleting route failed!"),
 	CITY_DOES_NOT_EXISTS(112, "City does not exists!"),
-    LOCATION_DOES_NOT_EXISTS(113, "Location does not exists!");;
+    LOCATION_DOES_NOT_EXISTS(113, "Location does not exists!"),
+    COMMENT_SUCCESSFUL(114,"Comment successful!"),
+    COMMENT_REJECT(115,"Comment failed!");
 
     StatusCode(int status, String message) {
         this.status = status;

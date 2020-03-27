@@ -2,6 +2,7 @@ package com.squadro.touricity.database;
 
 import com.squadro.touricity.database.query.ISingleQuery;
 import com.squadro.touricity.database.query.SelectionQuery;
+import com.squadro.touricity.database.query.commentQueries.InsertNewCommentPipeline;
 import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromCity;
 import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromCostAndDuration;
 import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromTransportation;
@@ -290,6 +291,15 @@ public class Database {
 		GetLikeInfoQuery likeInfoQuery = new GetLikeInfoQuery(like_id);
 		likeInfoQuery.execute();
 		return likeInfoQuery.getLike();
+	}
+
+	public static IMessage insertComment(CommentRegister commentRegister){
+		InsertNewCommentPipeline commentPipeline = new InsertNewCommentPipeline(commentRegister);
+		Database.execute(commentPipeline);
+		if(commentPipeline.isSuccessfull){
+			return Status.build(StatusCode.COMMENT_SUCCESSFUL);
+		}
+		return Status.build(StatusCode.COMMENT_REJECT);
 	}
 
 	public static IMessage signUp(String cookie, Credential userInfo) {
