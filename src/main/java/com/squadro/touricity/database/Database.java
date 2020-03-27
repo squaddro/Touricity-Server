@@ -7,6 +7,7 @@ import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromCi
 import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromCostAndDuration;
 import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromTransportation;
 import com.squadro.touricity.database.query.likeQueries.GetLikeInfoQuery;
+import com.squadro.touricity.database.query.likeQueries.InsertNewLikePipeline;
 import com.squadro.touricity.database.query.locationQueries.GetLocationInfoQuery;
 import com.squadro.touricity.database.query.pipeline.IPipelinedQuery;
 import com.squadro.touricity.database.query.routeQueries.*;
@@ -300,6 +301,15 @@ public class Database {
 			return Status.build(StatusCode.COMMENT_SUCCESSFUL);
 		}
 		return Status.build(StatusCode.COMMENT_REJECT);
+	}
+
+	public static IMessage insertLike(LikeRegister likeRegister){
+		InsertNewLikePipeline likePipeline = new InsertNewLikePipeline(likeRegister);
+		Database.execute(likePipeline);
+		if(likePipeline.isSuccessfull){
+			return Status.build(StatusCode.LIKE_SUCCESSFUL);
+		}
+		return Status.build(StatusCode.LIKE_REJECT);
 	}
 
 	public static IMessage signUp(String cookie, Credential userInfo) {

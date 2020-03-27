@@ -19,7 +19,9 @@ public enum StatusCode {
 	CITY_DOES_NOT_EXISTS(112, "City does not exists!"),
     LOCATION_DOES_NOT_EXISTS(113, "Location does not exists!"),
     COMMENT_SUCCESSFUL(114,"Comment successful!"),
-    COMMENT_REJECT(115,"Comment failed!");
+    COMMENT_REJECT(115,"Comment failed!"),
+    LIKE_SUCCESSFUL(116,"Liked successful!"),
+    LIKE_REJECT(117,"Liked failed!");
 
     StatusCode(int status, String message) {
         this.status = status;
