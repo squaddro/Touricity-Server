@@ -3,25 +3,18 @@ package com.squadro.touricity.message.types.data;
 public class CommentRegister implements ICommentRegister {
 
 	private String username;
-	private String commentId;
-	private String commentDesc;
-	private String routeId;
+	private Comment comment;
+	private RouteId routeId;
 
     public CommentRegister(){}
 
-    public CommentRegister(String username, String commentId, String commentDesc){
+    public CommentRegister(String username, Comment comment){
     	this.username = username;
-    	this.commentId = commentId;
-    	this.commentDesc = commentDesc;
+    	this.comment = comment;
 	}
 
-	public String getCommentId() {
-		return commentId;
-	}
-
-	@Override
-	public String getCommentDesc() {
-		return commentDesc;
+	public Comment getComment() {
+		return comment;
 	}
 
 	public String getUsername() {
@@ -29,15 +22,12 @@ public class CommentRegister implements ICommentRegister {
 	}
 
 	@Override
-	public String getRouteId() {
+	public RouteId getRouteId() {
 		return routeId;
 	}
 
-	public void setCommentId(String commentId) {
-		this.commentId = commentId;
-	}
-	public void setCommentDesc(String commentDesc) {
-		this.commentDesc = commentDesc;
+	public void setComment(Comment comment) {
+		this.comment = comment;
 	}
 
 	public void setUsername(String username) {
@@ -45,7 +35,7 @@ public class CommentRegister implements ICommentRegister {
 	}
 
 	@Override
-	public void setRouteId(String routeId) {
+	public void setRouteId(RouteId routeId) {
 		this.routeId = routeId;
 	}
 }

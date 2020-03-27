@@ -1,13 +1,11 @@
 package com.squadro.touricity.message.types.data;
 
 public interface ICommentRegister {
-    String getCommentId();
-    String getCommentDesc();
+    Comment getComment();
     String getUsername();
-    String getRouteId();
+    RouteId getRouteId();
 
-    void setCommentId(String commentId);
-    void setCommentDesc(String commentDesc);
+    void setComment(Comment comment);
     void setUsername(String username);
-    void setRouteId(String routeId);
+    void setRouteId(RouteId routeId);
 }

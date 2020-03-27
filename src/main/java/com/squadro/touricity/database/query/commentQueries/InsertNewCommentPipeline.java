@@ -36,12 +36,8 @@ public class InsertNewCommentPipeline extends PipelinedQuery {
             public boolean onResult(QueryResult result) throws SQLException {
                 if(result.isSuccessfull()) {
                     accountID = result.getResultSet().getString(Database.USER_ACCOUNT_ID);
-                    System.out.println("1.checkpoint");
-                    System.out.println(accountID);
                     String commentId = String.valueOf(UUID.randomUUID());
-                    commentRegister.setCommentId(commentId);
-                    System.out.println(commentRegister.getCommentId());
-                    System.out.println(commentRegister.getCommentDesc());
+                    commentRegister.getComment().setCommentId(commentId);
                     return true;
                 }
                 System.out.println("2.checkpoint");
@@ -52,7 +48,7 @@ public class InsertNewCommentPipeline extends PipelinedQuery {
         queue.add(new InsertionQuery() {
             @Override
             public String getQuery() {
-                return "INSERT INTO " + Database.COMMENT + "(account_id,comment_id,comment_desc) VALUES('" + accountID + "','" + commentRegister.getCommentId() + "','" + commentRegister.getCommentDesc() + "')";
+                return "INSERT INTO " + Database.COMMENT + "(account_id,comment_id,comment_desc) VALUES('" + accountID + "','" + commentRegister.getComment().getCommentId() + "','" + commentRegister.getComment().getCommentDesc() + "')";
             }
 
             @Override
@@ -67,7 +63,7 @@ public class InsertNewCommentPipeline extends PipelinedQuery {
         queue.add(new InsertionQuery() {
             @Override
             public String getQuery() {
-                return "INSERT INTO " + Database.ROUTE_COMMENT + "(route_id,comment_id) VALUES('" + commentRegister.getRouteId() + "','" + commentRegister.getCommentId() + "')";
+                return "INSERT INTO " + Database.ROUTE_COMMENT + "(route_id,comment_id) VALUES('" + commentRegister.getRouteId().getRoute_id() + "','" + commentRegister.getComment().getCommentId() + "')";
             }
 
             @Override
