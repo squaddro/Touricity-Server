@@ -2,10 +2,7 @@ package com.squadro.touricity.controller;
 
 import com.squadro.touricity.database.Database;
 import com.squadro.touricity.message.types.IMessage;
-import com.squadro.touricity.message.types.data.CommentRegister;
-import com.squadro.touricity.message.types.data.Like;
-import com.squadro.touricity.message.types.data.LikeId;
-import com.squadro.touricity.message.types.data.RouteId;
+import com.squadro.touricity.message.types.data.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +31,7 @@ public class CommentController {
 			consumes = MediaType.APPLICATION_JSON_VALUE
 	)
 	@ResponseBody
-	public List<CommentRegister> getComment(
+	public CommentRegisterList getComment(
 			@RequestBody RouteId routeId,
 			@CookieValue(value = "cookie_uuid", defaultValue = "notset") String cookie
 	) {

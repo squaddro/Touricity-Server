@@ -309,7 +309,7 @@ public class Database {
 		return Status.build(StatusCode.COMMENT_REJECT);
 	}
 
-    public static List<CommentRegister> getComment(RouteId routeId){
+    public static CommentRegisterList getComment(RouteId routeId){
 		SelectCommentIDFromRouteID selectCommentIDFromRouteID = new SelectCommentIDFromRouteID(routeId.getRoute_id());
 		selectCommentIDFromRouteID.execute();
 		List<CommentRegister> commentRegisterList = new ArrayList<CommentRegister>();
@@ -324,7 +324,8 @@ public class Database {
 				commentRegisterList.add(selectCommentFromCommentID.getCommentRegister());
 			}
         }
-        return commentRegisterList;
+		CommentRegisterList list = new CommentRegisterList(commentRegisterList);
+        return list;
     }
 
 	public static IMessage insertLike(LikeRegister likeRegister){
