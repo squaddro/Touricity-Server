@@ -2,14 +2,22 @@ package com.squadro.touricity.database;
 
 import com.squadro.touricity.database.query.ISingleQuery;
 import com.squadro.touricity.database.query.SelectionQuery;
+import com.squadro.touricity.database.query.commentQueries.InsertNewCommentPipeline;
+import com.squadro.touricity.database.query.commentQueries.SelectCommentFromCommentID;
+import com.squadro.touricity.database.query.commentQueries.SelectCommentIDFromRouteID;
+import com.squadro.touricity.database.query.commentQueries.SelectUsernameFromAccountId;
 import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromCity;
 import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromCostAndDuration;
 import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromTransportation;
 import com.squadro.touricity.database.query.likeQueries.GetLikeInfoQuery;
+import com.squadro.touricity.database.query.likeQueries.InsertNewLikePipeline;
 import com.squadro.touricity.database.query.locationQueries.GetLocationInfoQuery;
 import com.squadro.touricity.database.query.pipeline.IPipelinedQuery;
 import com.squadro.touricity.database.query.routeQueries.*;
-import com.squadro.touricity.database.query.userQueries.*;
+import com.squadro.touricity.database.query.userQueries.CreateNewUserQuery;
+import com.squadro.touricity.database.query.userQueries.LoginQuery;
+import com.squadro.touricity.database.query.userQueries.SessionDeletionQuery;
+import com.squadro.touricity.database.query.userQueries.UserCheckQuery;
 import com.squadro.touricity.database.result.QueryResult;
 import com.squadro.touricity.message.types.IMessage;
 import com.squadro.touricity.message.types.Status;
@@ -298,6 +306,43 @@ public class Database {
 		GetLikeInfoQuery likeInfoQuery = new GetLikeInfoQuery(like_id);
 		likeInfoQuery.execute();
 		return likeInfoQuery.getLike();
+	}
+
+	public static IMessage insertComment(CommentRegister commentRegister){
+		InsertNewCommentPipeline commentPipeline = new InsertNewCommentPipeline(commentRegister);
+		Database.execute(commentPipeline);
+		if(commentPipeline.isSuccessfull){
+			return Status.build(StatusCode.COMMENT_SUCCESSFUL);
+		}
+		return Status.build(StatusCode.COMMENT_REJECT);
+	}
+
+    public static CommentRegisterList getComment(RouteId routeId){
+		SelectCommentIDFromRouteID selectCommentIDFromRouteID = new SelectCommentIDFromRouteID(routeId.getRoute_id());
+		selectCommentIDFromRouteID.execute();
+		List<CommentRegister> commentRegisterList = new ArrayList<CommentRegister>();
+		if(selectCommentIDFromRouteID.isSuccessfull){
+            ArrayList<String> list = (ArrayList<String>) selectCommentIDFromRouteID.getList();
+            for(String s : list){
+				SelectCommentFromCommentID selectCommentFromCommentID = new SelectCommentFromCommentID(s);
+				selectCommentFromCommentID.execute();
+				CommentRegister commentRegister = selectCommentFromCommentID.getCommentRegister();
+				SelectUsernameFromAccountId selectUsernameFromAccountId = new SelectUsernameFromAccountId(commentRegister.getUsername(), commentRegister);
+				selectUsernameFromAccountId.execute();
+				commentRegisterList.add(selectCommentFromCommentID.getCommentRegister());
+			}
+        }
+		CommentRegisterList list = new CommentRegisterList(commentRegisterList);
+        return list;
+    }
+
+	public static IMessage insertLike(LikeRegister likeRegister){
+		InsertNewLikePipeline likePipeline = new InsertNewLikePipeline(likeRegister);
+		Database.execute(likePipeline);
+		if(likePipeline.isSuccessfull){
+			return Status.build(StatusCode.LIKE_SUCCESSFUL);
+		}
+		return Status.build(StatusCode.LIKE_REJECT);
 	}
 
 	public static IMessage signUp(String cookie, Credential userInfo) {
