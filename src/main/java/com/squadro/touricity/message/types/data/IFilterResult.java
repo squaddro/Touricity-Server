@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface IFilterResult extends IDataType{
 
-	List<Route> getRouteList();
+	List<RouteLike> getRouteList();
 
-	void setRouteList(List<Route> routeList);
+	void setRouteList(List<RouteLike> routeList);
 }
