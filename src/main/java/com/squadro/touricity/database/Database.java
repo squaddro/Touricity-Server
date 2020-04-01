@@ -267,7 +267,7 @@ public class Database {
 		routeIds.retainAll(selectionFromTransportation.getList());
 
 		List<String> routeIdList = new ArrayList<>(routeIds);
-		List<Route> routeList = new ArrayList<>();
+		List<RouteLike> routeList = new ArrayList<>();
 		CountDownLatch countDownLatch2 = new CountDownLatch(routeIds.size());
 
 		ExecutorService executor = Executors.newFixedThreadPool(16);
@@ -275,7 +275,7 @@ public class Database {
 			executor.execute(new Thread(() -> {
 				while (!checkConnection()) {
 				}
-				routeList.add(getRouteInfo(s));
+				routeList.add(getRouteLikeInfo(s));
 				countDownLatch2.countDown();
 			}));
 		}
@@ -403,6 +403,58 @@ public class Database {
 		return insertNewRouteQuery.getRoute();
 	}
 
+	public static RouteLike getRouteLikeInfo(String route_id) {
+
+		final AtomicReference<String> id = new AtomicReference<>(route_id);
+		final AtomicReference<String> creator = new AtomicReference<String>();
+		final AtomicReference<String> city_id = new AtomicReference<String>();
+		final List<IEntry> stops = Collections.synchronizedList(new ArrayList<>());
+		final List<IEntry> paths = Collections.synchronizedList(new ArrayList<>());
+		List<IEntry> entries = new ArrayList<>();
+		final AtomicReference<String> title = new AtomicReference<String>();
+		final AtomicInteger privacy = new AtomicInteger();
+
+		RouteInstancesSelectionFromRouteId routeInstancesSelectionFromRouteId = new RouteInstancesSelectionFromRouteId(route_id);
+		routeInstancesSelectionFromRouteId.execute();
+
+		creator.set(routeInstancesSelectionFromRouteId.getRoute().getCreator());
+		title.set(routeInstancesSelectionFromRouteId.getRoute().getTitle());
+		city_id.set(routeInstancesSelectionFromRouteId.getRoute().getCity_id());
+		privacy.set(routeInstancesSelectionFromRouteId.getRoute().getPrivacy());
+
+		StopListSelectionFromRouteId stopListSelectionFromRouteId = new StopListSelectionFromRouteId(route_id);
+		PathListSelectionFromRouteId pathListSelectionFromRouteId = new PathListSelectionFromRouteId(route_id);
+
+		stopListSelectionFromRouteId.execute();
+		pathListSelectionFromRouteId.execute();
+
+		stops.addAll(stopListSelectionFromRouteId.getList());
+		paths.addAll(pathListSelectionFromRouteId.getList());
+
+		entries = combineSortedStopsAndPaths(stops, paths);
+		IEntry[] entriesArr = entries.toArray(new IEntry[entries.size()]);
+
+		LikeIdSelectionFromRouteId likeIdSelectionFromRouteId = new LikeIdSelectionFromRouteId(id.get());
+		Database.execute(likeIdSelectionFromRouteId);
+		List<String> like_id = likeIdSelectionFromRouteId.getList();
+		int likeNum = like_id.size();
+		int likeSum = 0;
+		for(String s : like_id){
+			ScoreSelectionFromLikeId scoreSelectionFromLikeId = new ScoreSelectionFromLikeId(s);
+			scoreSelectionFromLikeId.execute();
+			likeSum = likeSum + scoreSelectionFromLikeId.getScore();
+		}
+		
+		double likeScore = 0;
+		if(likeNum!=0){
+		likeScore = likeSum / likeNum;
+		}
+
+		Route route = new Route(creator.get(), id.get(), entriesArr, city_id.get(), title.get(), privacy.get());
+		RouteLike routeLike = new RouteLike(route, likeScore);
+		return routeLike;
+	}
+
 	public static Route getRouteInfo(String route_id) {
 
 		final AtomicReference<String> id = new AtomicReference<>(route_id);
@@ -433,9 +485,9 @@ public class Database {
 
 		entries = combineSortedStopsAndPaths(stops, paths);
 		IEntry[] entriesArr = entries.toArray(new IEntry[entries.size()]);
+
 		return new Route(creator.get(), id.get(), entriesArr, city_id.get(), title.get(), privacy.get());
 	}
-
 	private static List<IEntry> combineSortedStopsAndPaths(List<IEntry> stops, List<IEntry> paths) {
 		List<IEntry> entries = new ArrayList<>();
 
