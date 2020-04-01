@@ -129,8 +129,9 @@ public class Database {
 	private boolean executeQuery(ISingleQuery query) {
 		String queryStr = query.getQuery();
 		logger.info("Execute: " + queryStr);
+		Connection conn = null;
 		try {
-			Connection conn = connect();
+			conn = connect();
 			PreparedStatement stmt = conn.prepareStatement(queryStr);
 
 			ResultSet resultSet = null;
@@ -152,6 +153,13 @@ public class Database {
 			conn.close();
 			return doContinue;
 		} catch (SQLException e) {
+			if(conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException ex) {
+					ex.printStackTrace();
+				}
+			}
 			e.printStackTrace();
 			query.onError("Query: " + queryStr + " Error: " + e.toString());
 			logger.info("Query error: " + e.toString());
