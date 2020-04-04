@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -262,8 +263,9 @@ public class Database {
 		List<Route> routeList = new ArrayList<>();
 		CountDownLatch countDownLatch2 = new CountDownLatch(routeIds.size());
 
-		ExecutorService executor = Executors.newFixedThreadPool(16);
+		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(16);
 		for (String s : routeIdList) {
+			while(executor.getActiveCount() == 16){}
 			executor.execute(new Thread(() -> {
 				while (!checkConnection()) {
 				}
