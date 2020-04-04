@@ -2,14 +2,22 @@ package com.squadro.touricity.database;
 
 import com.squadro.touricity.database.query.ISingleQuery;
 import com.squadro.touricity.database.query.SelectionQuery;
+import com.squadro.touricity.database.query.commentQueries.InsertNewCommentPipeline;
+import com.squadro.touricity.database.query.commentQueries.SelectCommentFromCommentID;
+import com.squadro.touricity.database.query.commentQueries.SelectCommentIDFromRouteID;
+import com.squadro.touricity.database.query.commentQueries.SelectUsernameFromAccountId;
 import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromCity;
 import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromCostAndDuration;
 import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromTransportation;
 import com.squadro.touricity.database.query.likeQueries.GetLikeInfoQuery;
+import com.squadro.touricity.database.query.likeQueries.InsertNewLikePipeline;
 import com.squadro.touricity.database.query.locationQueries.GetLocationInfoQuery;
 import com.squadro.touricity.database.query.pipeline.IPipelinedQuery;
 import com.squadro.touricity.database.query.routeQueries.*;
-import com.squadro.touricity.database.query.userQueries.*;
+import com.squadro.touricity.database.query.userQueries.CreateNewUserQuery;
+import com.squadro.touricity.database.query.userQueries.LoginQuery;
+import com.squadro.touricity.database.query.userQueries.SessionDeletionQuery;
+import com.squadro.touricity.database.query.userQueries.UserCheckQuery;
 import com.squadro.touricity.database.result.QueryResult;
 import com.squadro.touricity.message.types.IMessage;
 import com.squadro.touricity.message.types.Status;
@@ -260,7 +268,7 @@ public class Database {
 		routeIds.retainAll(selectionFromTransportation.getList());
 
 		List<String> routeIdList = new ArrayList<>(routeIds);
-		List<Route> routeList = new ArrayList<>();
+		List<RouteLike> routeList = new ArrayList<>();
 		CountDownLatch countDownLatch2 = new CountDownLatch(routeIds.size());
 
 		ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(16);
@@ -269,7 +277,7 @@ public class Database {
 			executor.execute(new Thread(() -> {
 				while (!checkConnection()) {
 				}
-				routeList.add(getRouteInfo(s));
+				routeList.add(getRouteLikeInfo(s));
 				countDownLatch2.countDown();
 			}));
 		}
@@ -300,6 +308,43 @@ public class Database {
 		GetLikeInfoQuery likeInfoQuery = new GetLikeInfoQuery(like_id);
 		likeInfoQuery.execute();
 		return likeInfoQuery.getLike();
+	}
+
+	public static IMessage insertComment(CommentRegister commentRegister){
+		InsertNewCommentPipeline commentPipeline = new InsertNewCommentPipeline(commentRegister);
+		Database.execute(commentPipeline);
+		if(commentPipeline.isSuccessfull){
+			return Status.build(StatusCode.COMMENT_SUCCESSFUL);
+		}
+		return Status.build(StatusCode.COMMENT_REJECT);
+	}
+
+    public static CommentRegisterList getComment(RouteId routeId){
+		SelectCommentIDFromRouteID selectCommentIDFromRouteID = new SelectCommentIDFromRouteID(routeId.getRoute_id());
+		selectCommentIDFromRouteID.execute();
+		List<CommentRegister> commentRegisterList = new ArrayList<CommentRegister>();
+		if(selectCommentIDFromRouteID.isSuccessfull){
+            ArrayList<String> list = (ArrayList<String>) selectCommentIDFromRouteID.getList();
+            for(String s : list){
+				SelectCommentFromCommentID selectCommentFromCommentID = new SelectCommentFromCommentID(s);
+				selectCommentFromCommentID.execute();
+				CommentRegister commentRegister = selectCommentFromCommentID.getCommentRegister();
+				SelectUsernameFromAccountId selectUsernameFromAccountId = new SelectUsernameFromAccountId(commentRegister.getUsername(), commentRegister);
+				selectUsernameFromAccountId.execute();
+				commentRegisterList.add(selectCommentFromCommentID.getCommentRegister());
+			}
+        }
+		CommentRegisterList list = new CommentRegisterList(commentRegisterList);
+        return list;
+    }
+
+	public static IMessage insertLike(LikeRegister likeRegister){
+		InsertNewLikePipeline likePipeline = new InsertNewLikePipeline(likeRegister);
+		Database.execute(likePipeline);
+		if(likePipeline.isSuccessfull){
+			return Status.build(StatusCode.LIKE_SUCCESSFUL);
+		}
+		return Status.build(StatusCode.LIKE_REJECT);
 	}
 
 	public static IMessage signUp(String cookie, Credential userInfo) {
@@ -360,6 +405,58 @@ public class Database {
 		return insertNewRouteQuery.getRoute();
 	}
 
+	public static RouteLike getRouteLikeInfo(String route_id) {
+
+		final AtomicReference<String> id = new AtomicReference<>(route_id);
+		final AtomicReference<String> creator = new AtomicReference<String>();
+		final AtomicReference<String> city_id = new AtomicReference<String>();
+		final List<IEntry> stops = Collections.synchronizedList(new ArrayList<>());
+		final List<IEntry> paths = Collections.synchronizedList(new ArrayList<>());
+		List<IEntry> entries = new ArrayList<>();
+		final AtomicReference<String> title = new AtomicReference<String>();
+		final AtomicInteger privacy = new AtomicInteger();
+
+		RouteInstancesSelectionFromRouteId routeInstancesSelectionFromRouteId = new RouteInstancesSelectionFromRouteId(route_id);
+		routeInstancesSelectionFromRouteId.execute();
+
+		creator.set(routeInstancesSelectionFromRouteId.getRoute().getCreator());
+		title.set(routeInstancesSelectionFromRouteId.getRoute().getTitle());
+		city_id.set(routeInstancesSelectionFromRouteId.getRoute().getCity_id());
+		privacy.set(routeInstancesSelectionFromRouteId.getRoute().getPrivacy());
+
+		StopListSelectionFromRouteId stopListSelectionFromRouteId = new StopListSelectionFromRouteId(route_id);
+		PathListSelectionFromRouteId pathListSelectionFromRouteId = new PathListSelectionFromRouteId(route_id);
+
+		stopListSelectionFromRouteId.execute();
+		pathListSelectionFromRouteId.execute();
+
+		stops.addAll(stopListSelectionFromRouteId.getList());
+		paths.addAll(pathListSelectionFromRouteId.getList());
+
+		entries = combineSortedStopsAndPaths(stops, paths);
+		IEntry[] entriesArr = entries.toArray(new IEntry[entries.size()]);
+
+		LikeIdSelectionFromRouteId likeIdSelectionFromRouteId = new LikeIdSelectionFromRouteId(id.get());
+		Database.execute(likeIdSelectionFromRouteId);
+		List<String> like_id = likeIdSelectionFromRouteId.getList();
+		int likeNum = like_id.size();
+		int likeSum = 0;
+		for(String s : like_id){
+			ScoreSelectionFromLikeId scoreSelectionFromLikeId = new ScoreSelectionFromLikeId(s);
+			scoreSelectionFromLikeId.execute();
+			likeSum = likeSum + scoreSelectionFromLikeId.getScore();
+		}
+		
+		double likeScore = 0;
+		if(likeNum!=0){
+		likeScore = likeSum / likeNum;
+		}
+
+		Route route = new Route(creator.get(), id.get(), entriesArr, city_id.get(), title.get(), privacy.get());
+		RouteLike routeLike = new RouteLike(route, likeScore);
+		return routeLike;
+	}
+
 	public static Route getRouteInfo(String route_id) {
 
 		final AtomicReference<String> id = new AtomicReference<>(route_id);
@@ -390,9 +487,9 @@ public class Database {
 
 		entries = combineSortedStopsAndPaths(stops, paths);
 		IEntry[] entriesArr = entries.toArray(new IEntry[entries.size()]);
+
 		return new Route(creator.get(), id.get(), entriesArr, city_id.get(), title.get(), privacy.get());
 	}
-
 	private static List<IEntry> combineSortedStopsAndPaths(List<IEntry> stops, List<IEntry> paths) {
 		List<IEntry> entries = new ArrayList<>();
 

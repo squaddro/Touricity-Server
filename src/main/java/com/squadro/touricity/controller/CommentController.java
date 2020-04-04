@@ -2,42 +2,40 @@ package com.squadro.touricity.controller;
 
 import com.squadro.touricity.database.Database;
 import com.squadro.touricity.message.types.IMessage;
-import com.squadro.touricity.message.types.data.Like;
-import com.squadro.touricity.message.types.data.LikeId;
-import com.squadro.touricity.message.types.data.LikeRegister;
+import com.squadro.touricity.message.types.data.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-public class LikeController {
+public class CommentController {
 	@RequestMapping(
-			value = "/like/info",
+			value = "/create/comment",
 			method = RequestMethod.POST,
 			produces = MediaType.APPLICATION_JSON_VALUE,
 			consumes = MediaType.APPLICATION_JSON_VALUE
 	)
 	@ResponseBody
-	public IMessage getLikeInfo(
-			@RequestBody LikeId like_id,
+	public IMessage insertComment(
+			@RequestBody CommentRegister commentRegister,
 			@CookieValue(value = "cookie_uuid", defaultValue = "notset") String cookie
 	) {
-		Like like = null;
-		like = Database.getLikeInfo(like_id.getLike_id());
-		return like;
+		return Database.insertComment(commentRegister);
 	}
 
 	@RequestMapping(
-			value = "/create/like",
+			value = "/get/comment",
 			method = RequestMethod.POST,
 			produces = MediaType.APPLICATION_JSON_VALUE,
 			consumes = MediaType.APPLICATION_JSON_VALUE
 	)
 	@ResponseBody
-	public IMessage insertLike(
-			@RequestBody LikeRegister likeRegister,
+	public CommentRegisterList getComment(
+			@RequestBody RouteId routeId,
 			@CookieValue(value = "cookie_uuid", defaultValue = "notset") String cookie
 	) {
-		return Database.insertLike(likeRegister);
+		return Database.getComment(routeId);
 	}
 }
 

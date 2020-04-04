@@ -6,17 +6,17 @@ import java.util.List;
 
 public class FilterResult implements IFilterResult {
 
-	private List<Route> routeList;
+	private List<RouteLike> routeList;
 
-	public FilterResult(List<Route> routeList) {
+	public FilterResult(List<RouteLike> routeList) {
 		this.routeList = routeList;
 	}
 
-	public List<Route> getRouteList() {
+	public List<RouteLike> getRouteList() {
 		return routeList;
 	}
 
-	public void setRouteList(List<Route> routeList) {
+	public void setRouteList(List<RouteLike> routeList) {
 		this.routeList = routeList;
 	}
 }
