@@ -35,15 +35,13 @@ public class InsertNewRouteQuery extends InsertionQuery{
     public String getQuery() {
         DoesRouteExists doesRouteExists = new DoesRouteExists(route_id.get());
         doesRouteExists.execute();
-
+        UserCheckQuery userCheckQuery = new UserCheckQuery(username);
+        userCheckQuery.execute();
+        creator.set(userCheckQuery.getAccountId());
         if(doesRouteExists.getDoesRouteExists()){
             return "UPDATE db_route SET creator = '" + creator + "', route_id = '" + route_id.get() + "', city_id = '" + city_id + "', title = '" + title + "', route_desc = 'dummy desc', privacy =" + privacy;
         }
         else{
-            UserCheckQuery userCheckQuery = new UserCheckQuery(username);
-            userCheckQuery.execute();
-            creator.set(userCheckQuery.getAccountId());
-
             String newID = UUID.randomUUID().toString();
             route_id.set(newID);
             return "INSERT INTO db_route(creator,route_id,city_id,title,route_desc,privacy) VALUES('" + creator + "','" + newID + "','" + city_id + "','" + title + "'," + "'desccc' ," + privacy + ")";
