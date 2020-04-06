@@ -317,13 +317,13 @@ public class Database {
 		return Status.build(StatusCode.COMMENT_REJECT);
 	}
 
-    public static CommentRegisterList getComment(RouteId routeId){
+	public static CommentRegisterList getComment(RouteId routeId){
 		SelectCommentIDFromRouteID selectCommentIDFromRouteID = new SelectCommentIDFromRouteID(routeId.getRoute_id());
 		selectCommentIDFromRouteID.execute();
 		List<CommentRegister> commentRegisterList = new ArrayList<CommentRegister>();
 		if(selectCommentIDFromRouteID.isSuccessfull){
-            ArrayList<String> list = (ArrayList<String>) selectCommentIDFromRouteID.getList();
-            for(String s : list){
+			ArrayList<String> list = (ArrayList<String>) selectCommentIDFromRouteID.getList();
+			for(String s : list){
 				SelectCommentFromCommentID selectCommentFromCommentID = new SelectCommentFromCommentID(s);
 				selectCommentFromCommentID.execute();
 				CommentRegister commentRegister = selectCommentFromCommentID.getCommentRegister();
@@ -331,10 +331,10 @@ public class Database {
 				selectUsernameFromAccountId.execute();
 				commentRegisterList.add(selectCommentFromCommentID.getCommentRegister());
 			}
-        }
+		}
 		CommentRegisterList list = new CommentRegisterList(commentRegisterList);
-        return list;
-    }
+		return list;
+	}
 
 	public static IMessage insertLike(LikeRegister likeRegister){
 		InsertNewLikePipeline likePipeline = new InsertNewLikePipeline(likeRegister);
@@ -396,8 +396,8 @@ public class Database {
 		return Status.build(StatusCode.SIGNOUT_SUCCESSFULL);
 	}
 
-	public static Route insertRoute(Route route) {
-		InsertNewRouteQuery insertNewRouteQuery = new InsertNewRouteQuery(route.getRoute_id(), route.getCreator(), route.getEntries(), route.getCity_id(), route.getTitle(), route.getPrivacy());
+	public static Route insertRoute(RouteRegister routeRegister) {
+		InsertNewRouteQuery insertNewRouteQuery = new InsertNewRouteQuery(routeRegister.getRoute(), routeRegister.getUsername());
 		insertNewRouteQuery.execute();
 
 		return insertNewRouteQuery.getRoute();
@@ -444,10 +444,10 @@ public class Database {
 			scoreSelectionFromLikeId.execute();
 			likeSum = likeSum + scoreSelectionFromLikeId.getScore();
 		}
-		
+
 		double likeScore = 0;
 		if(likeNum!=0){
-		likeScore = likeSum / likeNum;
+			likeScore = likeSum / likeNum;
 		}
 
 		Route route = new Route(creator.get(), id.get(), entriesArr, city_id.get(), title.get(), privacy.get());
