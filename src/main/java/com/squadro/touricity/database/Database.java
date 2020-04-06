@@ -399,8 +399,11 @@ public class Database {
 	public static Route insertRoute(RouteRegister routeRegister) {
 		InsertNewRouteQuery insertNewRouteQuery = new InsertNewRouteQuery(routeRegister.getRoute(), routeRegister.getUsername());
 		insertNewRouteQuery.execute();
+		Route route = insertNewRouteQuery.getRoute();
 
-		return insertNewRouteQuery.getRoute();
+		InsertDefaultLikeQuery insertDefaultLikeQuery = new InsertDefaultLikeQuery(route.getCreator(),route.getRoute_id());
+		Database.execute(insertDefaultLikeQuery);
+		return route;
 	}
 
 	public static RouteLike getRouteLikeInfo(String route_id) {
