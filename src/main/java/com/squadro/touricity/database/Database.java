@@ -395,9 +395,9 @@ public class Database {
 	public static void postLikeToFcm(LikeRegister likeRegister) {
 		String user_name = likeRegister.getUsername();
 		String route_id = likeRegister.getRouteId().getRoute_id();
-		DoesRouteExists doesRouteExists = new DoesRouteExists(route_id);
-		doesRouteExists.execute();
-		String account_id = doesRouteExists.getAccountId();
+		CreatorSelectionFromRouteId creatorSelectionFromRouteId = new CreatorSelectionFromRouteId(route_id);
+		creatorSelectionFromRouteId.execute();
+		String account_id = creatorSelectionFromRouteId.getCreator();
 		GetTokenFromAccountId getTokenFromAccountId = new GetTokenFromAccountId(account_id);
 		getTokenFromAccountId.execute();
 		String token = getTokenFromAccountId.getUserPassword();
@@ -425,9 +425,9 @@ public class Database {
 	public static void postCommentToFcm(CommentRegister commentRegister) {
 		String user_name = commentRegister.getUsername();
 		String route_id = commentRegister.getRouteId().getRoute_id();
-		DoesRouteExists doesRouteExists = new DoesRouteExists(route_id);
-		doesRouteExists.execute();
-		String account_id = doesRouteExists.getAccountId();
+		CreatorSelectionFromRouteId creatorSelectionFromRouteId = new CreatorSelectionFromRouteId(route_id);
+		creatorSelectionFromRouteId.execute();
+		String account_id = creatorSelectionFromRouteId.getCreator();
 		GetTokenFromAccountId getTokenFromAccountId = new GetTokenFromAccountId(account_id);
 		getTokenFromAccountId.execute();
 		String token = getTokenFromAccountId.getUserPassword();

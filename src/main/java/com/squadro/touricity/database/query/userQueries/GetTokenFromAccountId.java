@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class GetTokenFromAccountId extends SelectionQuery {
 
     private final String account_id;
-    final AtomicReference<String> token = new AtomicReference<>();
+    private String token;
     private boolean doesUserExist;
 
 
@@ -19,13 +19,13 @@ public class GetTokenFromAccountId extends SelectionQuery {
 
     @Override
     public String getQuery() {
-        return "SELECT * FROM DB_USER WHERE USERNAME = '" + account_id + "'";
+        return "SELECT * FROM DB_USER WHERE ACCOUNT_ID = '" + account_id + "'";
     }
 
     @Override
     public boolean onResult(QueryResult result) throws SQLException {
         if(result.isSuccessfull()){
-            token.set(result.getResultSet().getString("user_password"));
+            token = result.getResultSet().getString("user_password");
             doesUserExist = true;
         }
         else{
@@ -40,6 +40,6 @@ public class GetTokenFromAccountId extends SelectionQuery {
         return String.valueOf(token);
     }
     public String getAccountId(){
-        return String.valueOf(account_id);
+        return token;
     }
 }

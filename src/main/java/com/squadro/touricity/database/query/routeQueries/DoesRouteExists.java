@@ -10,7 +10,6 @@ import java.util.concurrent.atomic.AtomicReference;
 public class DoesRouteExists extends SelectionQuery {
 
     private final String route_id;
-    final AtomicReference<String> account_id = new AtomicReference<>();
     private boolean doesRouteExists;
 
     public DoesRouteExists(String route_id) {
@@ -26,7 +25,6 @@ public class DoesRouteExists extends SelectionQuery {
     public boolean onResult(QueryResult result) throws SQLException {
         if(result.isSuccessfull()) {
             doesRouteExists = true;
-            account_id.set(result.getResultSet().getString("creator"));
         }
         else
             doesRouteExists = false;
@@ -35,9 +33,5 @@ public class DoesRouteExists extends SelectionQuery {
 
     public boolean getDoesRouteExists(){
         return doesRouteExists;
-    }
-
-    public String getAccountId(){
-        return String.valueOf(account_id);
     }
 }
