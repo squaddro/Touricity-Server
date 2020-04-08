@@ -44,20 +44,4 @@ public class UserController {
         msg = Database.signIn(cookie,credential);
         return msg;
     }
-
-    @RequestMapping(
-            value = "/signout",
-            method = RequestMethod.POST,
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE
-    )
-    @ResponseBody
-    public IMessage signOut(
-            @RequestBody Credential credential,
-            @CookieValue(value = "cookie_uuid", defaultValue = "notset") String cookie
-    ){
-        IMessage msg = null;
-        msg = Database.signOut(cookie,credential);
-        return msg;
-    }
 }
