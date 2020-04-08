@@ -5,6 +5,7 @@ import com.squadro.touricity.database.result.QueryResult;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class DoesRouteExists extends SelectionQuery {
 
@@ -22,8 +23,9 @@ public class DoesRouteExists extends SelectionQuery {
 
     @Override
     public boolean onResult(QueryResult result) throws SQLException {
-        if(result.isSuccessfull())
+        if(result.isSuccessfull()) {
             doesRouteExists = true;
+        }
         else
             doesRouteExists = false;
         return false;
