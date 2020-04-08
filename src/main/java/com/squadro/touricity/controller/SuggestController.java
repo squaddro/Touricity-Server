@@ -1,6 +1,7 @@
 package com.squadro.touricity.controller;
 
 import com.squadro.touricity.database.Database;
+import com.squadro.touricity.message.types.Suggestion;
 import com.squadro.touricity.message.types.data.BoundPoints;
 import com.squadro.touricity.message.types.data.Location;
 import org.springframework.http.MediaType;
@@ -17,7 +18,7 @@ public class SuggestController {
             consumes = MediaType.APPLICATION_JSON_VALUE
     )
     @ResponseBody
-    public List<Location> suggest(
+    public Suggestion suggest(
             @RequestBody BoundPoints boundPoints,
             @CookieValue(value = "cookie_uuid", defaultValue = "notset") String cookie
     ) {

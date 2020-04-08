@@ -22,6 +22,7 @@ import com.squadro.touricity.database.query.userQueries.UserCheckQuery;
 import com.squadro.touricity.database.result.QueryResult;
 import com.squadro.touricity.message.types.IMessage;
 import com.squadro.touricity.message.types.Status;
+import com.squadro.touricity.message.types.Suggestion;
 import com.squadro.touricity.message.types.data.*;
 import com.squadro.touricity.message.types.data.enumeration.PathType;
 import com.squadro.touricity.message.types.data.enumeration.StatusCode;
@@ -346,10 +347,10 @@ public class Database {
 		return Status.build(StatusCode.LIKE_REJECT);
 	}
 
-	public static List<Location> suggest(BoundPoints boundPoints) {
+	public static Suggestion suggest(BoundPoints boundPoints) {
 		SuggestionQuery suggestionQuery = new SuggestionQuery(boundPoints);
 		suggestionQuery.execute();
-		return suggestionQuery.getLocationList();
+		return new Suggestion(suggestionQuery.getLocationList());
 	}
 
 	public static IMessage signUp(String cookie, Credential userInfo) {
