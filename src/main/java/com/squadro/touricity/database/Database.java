@@ -15,10 +15,7 @@ import com.squadro.touricity.database.query.locationQueries.GetLocationInfoQuery
 import com.squadro.touricity.database.query.locationQueries.SuggestionQuery;
 import com.squadro.touricity.database.query.pipeline.IPipelinedQuery;
 import com.squadro.touricity.database.query.routeQueries.*;
-import com.squadro.touricity.database.query.userQueries.CreateNewUserQuery;
-import com.squadro.touricity.database.query.userQueries.LoginQuery;
-import com.squadro.touricity.database.query.userQueries.SessionDeletionQuery;
-import com.squadro.touricity.database.query.userQueries.UserCheckQuery;
+import com.squadro.touricity.database.query.userQueries.*;
 import com.squadro.touricity.database.result.QueryResult;
 import com.squadro.touricity.message.types.IMessage;
 import com.squadro.touricity.message.types.Status;
@@ -39,7 +36,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-
+import org.json.JSONObject;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.web.client.RestTemplate;
 public class Database {
 
 	private static Database instance;
@@ -314,18 +315,19 @@ public class Database {
 		InsertNewCommentPipeline commentPipeline = new InsertNewCommentPipeline(commentRegister);
 		Database.execute(commentPipeline);
 		if(commentPipeline.isSuccessfull){
+			postCommentToFcm(commentRegister);
 			return Status.build(StatusCode.COMMENT_SUCCESSFUL);
 		}
 		return Status.build(StatusCode.COMMENT_REJECT);
 	}
 
-    public static CommentRegisterList getComment(RouteId routeId){
+	public static CommentRegisterList getComment(RouteId routeId){
 		SelectCommentIDFromRouteID selectCommentIDFromRouteID = new SelectCommentIDFromRouteID(routeId.getRoute_id());
 		selectCommentIDFromRouteID.execute();
 		List<CommentRegister> commentRegisterList = new ArrayList<CommentRegister>();
 		if(selectCommentIDFromRouteID.isSuccessfull){
-            ArrayList<String> list = (ArrayList<String>) selectCommentIDFromRouteID.getList();
-            for(String s : list){
+			ArrayList<String> list = (ArrayList<String>) selectCommentIDFromRouteID.getList();
+			for(String s : list){
 				SelectCommentFromCommentID selectCommentFromCommentID = new SelectCommentFromCommentID(s);
 				selectCommentFromCommentID.execute();
 				CommentRegister commentRegister = selectCommentFromCommentID.getCommentRegister();
@@ -333,15 +335,16 @@ public class Database {
 				selectUsernameFromAccountId.execute();
 				commentRegisterList.add(selectCommentFromCommentID.getCommentRegister());
 			}
-        }
+		}
 		CommentRegisterList list = new CommentRegisterList(commentRegisterList);
-        return list;
-    }
+		return list;
+	}
 
 	public static IMessage insertLike(LikeRegister likeRegister){
 		InsertNewLikePipeline likePipeline = new InsertNewLikePipeline(likeRegister);
 		Database.execute(likePipeline);
 		if(likePipeline.isSuccessfull){
+			postLikeToFcm(likeRegister);
 			return Status.build(StatusCode.LIKE_SUCCESSFUL);
 		}
 		return Status.build(StatusCode.LIKE_REJECT);
@@ -397,18 +400,74 @@ public class Database {
 			return Status.build(StatusCode.SIGNIN_REJECT);
 	}
 
-	public static IMessage signOut(String cookie, Credential userInfo) {
-		SessionDeletionQuery sessionDeletionQuery = new SessionDeletionQuery(cookie);
-		sessionDeletionQuery.execute();
+	public static void postLikeToFcm(LikeRegister likeRegister) {
+		String user_name = likeRegister.getUsername();
+		String route_id = likeRegister.getRouteId().getRoute_id();
+		CreatorSelectionFromRouteId creatorSelectionFromRouteId = new CreatorSelectionFromRouteId(route_id);
+		creatorSelectionFromRouteId.execute();
+		String account_id = creatorSelectionFromRouteId.getCreator();
+		GetTokenFromAccountId getTokenFromAccountId = new GetTokenFromAccountId(account_id);
+		getTokenFromAccountId.execute();
+		String token = getTokenFromAccountId.getUserPassword();
 
-		return Status.build(StatusCode.SIGNOUT_SUCCESSFULL);
+		RestTemplate restTemplate = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		String key = "AAAAKO3rtsw:APA91bEnHnMHXGg54aiQSfd6Vq7iUMCNrewtd4oQGhvXxv-wWLfy21vGKXj4N0Vg9Nrt2Q6CscKVHPtcOB-WARJ6Q_vgW1Va2xiyCSeFWQKIkFGtWuvjaGR0fBYC4wa2ZJ7VgWZEyDvt";
+		headers.add("Authorization", "key=" + key);
+
+		JSONObject obj = new JSONObject();
+		obj.put("to", token);
+
+		JSONObject innerObj = new JSONObject();
+		innerObj.put("title", "Touricity");
+		innerObj.put("body",user_name + " liked your route!");
+		obj.put("notification", innerObj);
+
+		String url = "https://fcm.googleapis.com/fcm/send";
+
+		HttpEntity<String> request = new HttpEntity<String>(obj.toString(), headers);
+		restTemplate.postForObject(url, request, String.class);
 	}
 
-	public static Route insertRoute(Route route) {
-		InsertNewRouteQuery insertNewRouteQuery = new InsertNewRouteQuery(route.getRoute_id(), route.getCreator(), route.getEntries(), route.getCity_id(), route.getTitle(), route.getPrivacy());
-		insertNewRouteQuery.execute();
+	public static void postCommentToFcm(CommentRegister commentRegister) {
+		String user_name = commentRegister.getUsername();
+		String route_id = commentRegister.getRouteId().getRoute_id();
+		CreatorSelectionFromRouteId creatorSelectionFromRouteId = new CreatorSelectionFromRouteId(route_id);
+		creatorSelectionFromRouteId.execute();
+		String account_id = creatorSelectionFromRouteId.getCreator();
+		GetTokenFromAccountId getTokenFromAccountId = new GetTokenFromAccountId(account_id);
+		getTokenFromAccountId.execute();
+		String token = getTokenFromAccountId.getUserPassword();
 
-		return insertNewRouteQuery.getRoute();
+		String comment = commentRegister.getComment().getCommentDesc();
+		RestTemplate restTemplate = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		String key = "AAAAKO3rtsw:APA91bEnHnMHXGg54aiQSfd6Vq7iUMCNrewtd4oQGhvXxv-wWLfy21vGKXj4N0Vg9Nrt2Q6CscKVHPtcOB-WARJ6Q_vgW1Va2xiyCSeFWQKIkFGtWuvjaGR0fBYC4wa2ZJ7VgWZEyDvt";
+		headers.add("Authorization", "key=" + key);
+
+		JSONObject obj = new JSONObject();
+		obj.put("to", token);
+
+		JSONObject innerObj = new JSONObject();
+		innerObj.put("title", "Touricity");
+		innerObj.put("body",user_name + " commented : " + comment);
+		obj.put("notification", innerObj);
+
+		String url = "https://fcm.googleapis.com/fcm/send";
+
+		HttpEntity<String> request = new HttpEntity<String>(obj.toString(), headers);
+		restTemplate.postForObject(url, request, String.class);
+	}
+	public static Route insertRoute(RouteRegister routeRegister) {
+		InsertNewRouteQuery insertNewRouteQuery = new InsertNewRouteQuery(routeRegister.getRoute(), routeRegister.getUsername());
+		insertNewRouteQuery.execute();
+		Route route = insertNewRouteQuery.getRoute();
+
+		InsertDefaultLikeQuery insertDefaultLikeQuery = new InsertDefaultLikeQuery(route.getCreator(),route.getRoute_id());
+		Database.execute(insertDefaultLikeQuery);
+		return route;
 	}
 
 	public static RouteLike getRouteLikeInfo(String route_id) {
@@ -452,10 +511,10 @@ public class Database {
 			scoreSelectionFromLikeId.execute();
 			likeSum = likeSum + scoreSelectionFromLikeId.getScore();
 		}
-		
+
 		double likeScore = 0;
 		if(likeNum!=0){
-		likeScore = likeSum / likeNum;
+			likeScore = likeSum / likeNum;
 		}
 
 		Route route = new Route(creator.get(), id.get(), entriesArr, city_id.get(), title.get(), privacy.get());

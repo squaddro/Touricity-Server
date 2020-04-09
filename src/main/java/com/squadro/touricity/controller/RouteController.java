@@ -4,6 +4,7 @@ import com.squadro.touricity.database.Database;
 import com.squadro.touricity.message.types.data.RouteId;
 import com.squadro.touricity.message.types.IMessage;
 import com.squadro.touricity.message.types.data.Route;
+import com.squadro.touricity.message.types.data.RouteRegister;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,11 +51,11 @@ public class RouteController {
     )
     @ResponseBody
     public Route updateRoute(
-            @RequestBody Route route,
+            @RequestBody RouteRegister routeRegister,
             @CookieValue(value = "cookie_uuid", defaultValue = "notset") String cookie
     ){
         Route newRoute = null;
-        newRoute = Database.insertRoute(route);
+        newRoute = Database.insertRoute(routeRegister);
         return newRoute;
     }
 
