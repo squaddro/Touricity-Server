@@ -12,12 +12,14 @@ import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromTr
 import com.squadro.touricity.database.query.likeQueries.GetLikeInfoQuery;
 import com.squadro.touricity.database.query.likeQueries.InsertNewLikePipeline;
 import com.squadro.touricity.database.query.locationQueries.GetLocationInfoQuery;
+import com.squadro.touricity.database.query.locationQueries.SuggestionQuery;
 import com.squadro.touricity.database.query.pipeline.IPipelinedQuery;
 import com.squadro.touricity.database.query.routeQueries.*;
 import com.squadro.touricity.database.query.userQueries.*;
 import com.squadro.touricity.database.result.QueryResult;
 import com.squadro.touricity.message.types.IMessage;
 import com.squadro.touricity.message.types.Status;
+import com.squadro.touricity.message.types.Suggestion;
 import com.squadro.touricity.message.types.data.*;
 import com.squadro.touricity.message.types.data.enumeration.PathType;
 import com.squadro.touricity.message.types.data.enumeration.StatusCode;
@@ -346,6 +348,12 @@ public class Database {
 			return Status.build(StatusCode.LIKE_SUCCESSFUL);
 		}
 		return Status.build(StatusCode.LIKE_REJECT);
+	}
+
+	public static Suggestion suggest(BoundPoints boundPoints) {
+		SuggestionQuery suggestionQuery = new SuggestionQuery(boundPoints);
+		suggestionQuery.execute();
+		return new Suggestion(suggestionQuery.getLocationList());
 	}
 
 	public static IMessage signUp(String cookie, Credential userInfo) {
