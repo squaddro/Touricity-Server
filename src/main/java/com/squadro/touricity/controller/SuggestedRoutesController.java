@@ -1,6 +1,7 @@
 package com.squadro.touricity.controller;
 
 import com.squadro.touricity.database.Database;
+import com.squadro.touricity.message.types.data.Dummy;
 import com.squadro.touricity.message.types.data.RouteSuggestion;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +15,7 @@ public class SuggestedRoutesController {
     )
     @ResponseBody
     public RouteSuggestion suggestRoutes(
-            @RequestBody String dummy,
+            @RequestBody Dummy dummy,
             @CookieValue(value = "cookie_uuid", defaultValue = "notset") String cookie
     ) {
         return Database.suggestRoutes();
