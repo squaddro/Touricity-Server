@@ -1,9 +1,6 @@
-package com.squadro.touricity.message.types;
-
-import com.squadro.touricity.message.types.data.Location;
+package com.squadro.touricity.message.types.data;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Suggestion {
     private ArrayList<Location> locationList;

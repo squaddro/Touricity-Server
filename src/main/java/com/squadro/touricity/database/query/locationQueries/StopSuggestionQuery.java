@@ -10,7 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class SuggestionQuery extends SelectionQuery {
+public class StopSuggestionQuery extends SelectionQuery {
 
     private ArrayList<Location> locationList = new ArrayList<>(5);
 
@@ -19,7 +19,7 @@ public class SuggestionQuery extends SelectionQuery {
     private double maxLat;
     private double minLat;
 
-    public SuggestionQuery(BoundPoints bp){
+    public StopSuggestionQuery(BoundPoints bp){
         this.maxLat = bp.getMaxLat();
         this.maxLng = bp.getMaxLng();
         this.minLat = bp.getMinLat();
