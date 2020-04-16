@@ -362,11 +362,14 @@ public class Database {
 		routeSuggestionQuery.execute();
 		ArrayList<String> ids = routeSuggestionQuery.getRouteIdList();
 
-		RouteSuggestion routeSuggestion = new RouteSuggestion();
 
+
+		List<RouteLike> rlList = new ArrayList<>(5);
 		for (String s:ids) {
-			routeSuggestion.getRouteList().add(getRouteInfo(s));
+			rlList.add(getRouteLikeInfo(s));
 		}
+
+		RouteSuggestion routeSuggestion = new RouteSuggestion(rlList);
 		return routeSuggestion;
 	}
 
