@@ -12,14 +12,15 @@ import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromTr
 import com.squadro.touricity.database.query.likeQueries.GetLikeInfoQuery;
 import com.squadro.touricity.database.query.likeQueries.InsertNewLikePipeline;
 import com.squadro.touricity.database.query.locationQueries.GetLocationInfoQuery;
-import com.squadro.touricity.database.query.locationQueries.SuggestionQuery;
+import com.squadro.touricity.database.query.locationQueries.RouteSuggestionQuery;
+import com.squadro.touricity.database.query.locationQueries.StopSuggestionQuery;
 import com.squadro.touricity.database.query.pipeline.IPipelinedQuery;
 import com.squadro.touricity.database.query.routeQueries.*;
 import com.squadro.touricity.database.query.userQueries.*;
 import com.squadro.touricity.database.result.QueryResult;
 import com.squadro.touricity.message.types.IMessage;
 import com.squadro.touricity.message.types.Status;
-import com.squadro.touricity.message.types.Suggestion;
+import com.squadro.touricity.message.types.data.Suggestion;
 import com.squadro.touricity.message.types.data.*;
 import com.squadro.touricity.message.types.data.enumeration.PathType;
 import com.squadro.touricity.message.types.data.enumeration.StatusCode;
@@ -350,11 +351,25 @@ public class Database {
 		return Status.build(StatusCode.LIKE_REJECT);
 	}
 
-	public static Suggestion suggest(BoundPoints boundPoints) {
-		SuggestionQuery suggestionQuery = new SuggestionQuery(boundPoints);
-		suggestionQuery.execute();
-		return new Suggestion(suggestionQuery.getLocationList());
+	public static Suggestion suggestStops(BoundPoints boundPoints) {
+		StopSuggestionQuery stopSuggestionQuery = new StopSuggestionQuery(boundPoints);
+		stopSuggestionQuery.execute();
+		return new Suggestion(stopSuggestionQuery.getLocationList());
 	}
+
+	public static RouteSuggestion suggestRoutes() {
+		RouteSuggestionQuery routeSuggestionQuery = new RouteSuggestionQuery();
+		routeSuggestionQuery.execute();
+		ArrayList<String> ids = routeSuggestionQuery.getRouteIdList();
+
+		RouteSuggestion routeSuggestion = new RouteSuggestion();
+
+		for (String s:ids) {
+			routeSuggestion.getRouteList().add(getRouteInfo(s));
+		}
+		return routeSuggestion;
+	}
+
 
 	public static IMessage signUp(String cookie, Credential userInfo) {
 		String user = userInfo.getUser_name();
