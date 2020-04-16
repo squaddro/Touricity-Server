@@ -13,7 +13,7 @@ public class RouteSuggestionQuery extends SelectionQuery {
 
     @Override
     public String getQuery() {
-        return "SELECT ROUTE_ID FROM DB_SUGGESTED LIMIT 5";
+        return "SELECT * FROM DB_SUGGESTED";
     }
 
     @Override
@@ -21,7 +21,7 @@ public class RouteSuggestionQuery extends SelectionQuery {
         ResultSet rs = result.getResultSet();
         if(result.isSuccessfull()){
             do{
-                routeIdList.add(rs.getString("route_id"));
+                routeIdList.add(rs.getString("suggested_id"));
             }while(rs.next());
         }
         return false;
