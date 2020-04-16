@@ -357,7 +357,7 @@ public class Database {
 		return new Suggestion(stopSuggestionQuery.getLocationList());
 	}
 
-	public static RouteSuggestion suggestRoutes() {
+	public static RouteSuggestion suggestRoutes(Dummy dummy) {
 		RouteSuggestionQuery routeSuggestionQuery = new RouteSuggestionQuery();
 		routeSuggestionQuery.execute();
 		ArrayList<String> ids = routeSuggestionQuery.getRouteIdList();

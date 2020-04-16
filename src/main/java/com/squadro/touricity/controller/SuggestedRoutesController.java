@@ -18,6 +18,6 @@ public class SuggestedRoutesController {
             @RequestBody Dummy dummy,
             @CookieValue(value = "cookie_uuid", defaultValue = "notset") String cookie
     ) {
-        return Database.suggestRoutes();
+        return Database.suggestRoutes(dummy);
     }
 }
