@@ -4,7 +4,6 @@ import com.squadro.touricity.database.query.SelectionQuery;
 import com.squadro.touricity.database.result.QueryResult;
 import com.squadro.touricity.message.types.data.BoundPoints;
 import com.squadro.touricity.message.types.data.Location;
-import jdk.nashorn.internal.objects.annotations.Getter;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

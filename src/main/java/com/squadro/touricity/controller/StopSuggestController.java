@@ -6,7 +6,6 @@ import com.squadro.touricity.message.types.data.BoundPoints;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-
 @RestController
 public class StopSuggestController {
     @RequestMapping(

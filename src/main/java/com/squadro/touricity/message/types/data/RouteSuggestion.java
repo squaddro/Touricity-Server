@@ -6,6 +6,10 @@ public class RouteSuggestion {
 
     private ArrayList<Route> routeList;
 
+    public RouteSuggestion(){
+        routeList = new ArrayList<>(5);
+    }
+
     public ArrayList<Route> getRouteList() {
         return routeList;
     }
