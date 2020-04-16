@@ -6,6 +6,7 @@ import com.squadro.touricity.message.types.data.RouteSuggestion;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+@RestController
 public class SuggestedRoutesController {
     @RequestMapping(
             value = "/suggestedRoutes",
