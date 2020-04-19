@@ -21,7 +21,7 @@ public class RouteIdSelectionFromCostAndDuration extends SelectionQuery {
 	}
 
 	public String getQuery() {
-		return "SELECT DB_ROUTE.route_id,SUM(expense), SUM(duration) " +
+		return "SELECT DB_ROUTE.route_id,AVG(expense), SUM(duration) " +
 				"FROM DB_ROUTE INNER JOIN DB_ENTRY ON DB_ROUTE.route_id = DB_ENTRY.route_id " +
 				"GROUP BY DB_ROUTE.route_id " +
 				"HAVING AVG(expense) <= '" + averageCost + "' AND SUM(duration) <= '" + duration + "'";

@@ -19,11 +19,12 @@ public class RouteIdSelectionFromLike extends SelectionQuery {
 	}
 
 	public String getQuery() {
-		return "SELECT DB_ROUTE.route_id " +
+		return "SELECT DB_ROUTE.route_id,AVG(score) " +
 				"FROM DB_ROUTE_LIKE " +
 				"INNER JOIN DB_ROUTE ON DB_ROUTE.route_id = DB_ROUTE_LIKE.route_id " +
 				"INNER JOIN DB_LIKE ON DB_ROUTE_LIKE.like_id = DB_LIKE.like_id " +
-				"WHERE DB_LIKE.score >= " + minRate;
+				"GROUP BY DB_ROUTE.route_id " +
+				"HAVING AVG(score) >= '" + minRate + "'";
 	}
 
 	public boolean onResult(QueryResult result) throws SQLException {
