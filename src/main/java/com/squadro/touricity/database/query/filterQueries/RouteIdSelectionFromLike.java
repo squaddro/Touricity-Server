@@ -24,7 +24,7 @@ public class RouteIdSelectionFromLike extends SelectionQuery {
 				"INNER JOIN DB_ROUTE ON DB_ROUTE.route_id = DB_ROUTE_LIKE.route_id " +
 				"INNER JOIN DB_LIKE ON DB_ROUTE_LIKE.like_id = DB_LIKE.like_id " +
 				"GROUP BY DB_ROUTE.route_id " +
-				"HAVING AVG(expense) >= '" + minRate + "'";
+				"HAVING AVG(score) >= '" + minRate + "'";
 	}
 
 	public boolean onResult(QueryResult result) throws SQLException {
