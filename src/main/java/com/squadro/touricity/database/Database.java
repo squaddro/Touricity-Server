@@ -8,6 +8,7 @@ import com.squadro.touricity.database.query.commentQueries.SelectCommentIDFromRo
 import com.squadro.touricity.database.query.commentQueries.SelectUsernameFromAccountId;
 import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromCity;
 import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromCostAndDuration;
+import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromLike;
 import com.squadro.touricity.database.query.filterQueries.RouteIdSelectionFromTransportation;
 import com.squadro.touricity.database.query.likeQueries.GetLikeInfoQuery;
 import com.squadro.touricity.database.query.likeQueries.InsertNewLikePipeline;
@@ -236,9 +237,9 @@ public class Database {
 		RouteIdSelectionFromCity selectionFromCity = new RouteIdSelectionFromCity(city_name);
 		RouteIdSelectionFromCostAndDuration selectionFromCostAndDuration = new RouteIdSelectionFromCostAndDuration(expense, duration);
 		RouteIdSelectionFromTransportation selectionFromTransportation = new RouteIdSelectionFromTransportation(typeList);
-//		RouteIdSelectionFromLike selectionFromLike = new RouteIdSelectionFromLike(score);
+		RouteIdSelectionFromLike selectionFromLike = new RouteIdSelectionFromLike(score);
 
-		CountDownLatch countDownLatch = new CountDownLatch(3);
+		CountDownLatch countDownLatch = new CountDownLatch(4);
 		new Thread(() -> {
 			selectionFromCity.execute();
 			countDownLatch.countDown();
@@ -248,12 +249,12 @@ public class Database {
 			selectionFromCostAndDuration.execute();
 			countDownLatch.countDown();
 		}).start();
-/*
+
 		new Thread(() -> {
 			selectionFromLike.execute();
 			countDownLatch.countDown();
 		}).start();
-*/
+
 		new Thread(() -> {
 			selectionFromTransportation.execute();
 			countDownLatch.countDown();
@@ -267,7 +268,7 @@ public class Database {
 
 		HashSet<String> routeIds = new HashSet<String>(selectionFromCity.getList());
 		routeIds.retainAll(selectionFromCostAndDuration.getList());
-		//	routeIds.retainAll(selectionFromLike.getList());
+		routeIds.retainAll(selectionFromLike.getList());
 		routeIds.retainAll(selectionFromTransportation.getList());
 
 		List<String> routeIdList = new ArrayList<>(routeIds);
